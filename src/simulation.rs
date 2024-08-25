@@ -15,20 +15,20 @@ pub struct Simulation {
 
 impl Simulation {
     pub fn new(starting_noms_amount: u64, starting_food_amount: u64) -> Simulation {
-        let temp_prevent_spawn_outside: u64 = 20;
+        let border_offset: u64 = 8;
         let mut rng = thread_rng();
         let mut nom_vec: Vec<Nom> = Vec::new();
         for _i in 0..starting_noms_amount {
             nom_vec.push(Nom::new([
-                rng.gen_range(0..900 - temp_prevent_spawn_outside),
-                rng.gen_range(0..600 - temp_prevent_spawn_outside),
+                rng.gen_range(border_offset..900 - border_offset),
+                rng.gen_range(border_offset..600 - border_offset),
             ]));
         }
         let mut food_vec: Vec<Food> = Vec::new();
         for _i in 0..starting_food_amount {
             food_vec.push(Food::new([
-                rng.gen_range(0..900 - temp_prevent_spawn_outside),
-                rng.gen_range(0..600 - temp_prevent_spawn_outside),
+                rng.gen_range(border_offset..900 - border_offset),
+                rng.gen_range(border_offset..600 - border_offset),
             ]));
         }
         return Simulation {

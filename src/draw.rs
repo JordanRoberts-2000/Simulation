@@ -4,6 +4,10 @@ use piston_window::{ellipse, line, Context, G2d};
 use std::f64::consts::PI;
 
 pub fn draw_circle(color: Color, position: [u64; 2], size: u64, c: &Context, g: &mut G2d) {
+    // - size / 2 makes the position parameter the center of the circle
+    if position[0] < size / 2 || position[1] < size / 2 {
+        panic!("draw_circle: attempted to spawn too close to border");
+    }
     ellipse(
         color,
         [
