@@ -1,45 +1,9 @@
 use piston_window::types::Color;
-use piston_window::{ellipse, line, rectangle, Context, G2d};
+use piston_window::*;
+use piston_window::{ellipse, line, Context, G2d};
 use std::f64::consts::PI;
 
-const FOOD_SIZE: f64 = 10.0;
-const NOM_COLOR: Color = [0.7, 0.0, 0.7, 1.0];
-const NOM_BORDER_COLOR: Color = [0.4, 0.0, 0.4, 1.0];
-
-pub fn draw_food(color: Color, x: i32, y: i32, con: &Context, g: &mut G2d) {
-    rectangle(
-        color,
-        [(x as f64), (y as f64), FOOD_SIZE, FOOD_SIZE],
-        con.transform,
-        g,
-    )
-}
-
-pub fn draw_nom(position: [u64; 2], size: u64, c: &Context, g: &mut G2d) {
-    draw_circle(
-        if size > 3 {
-            NOM_COLOR
-        } else {
-            NOM_BORDER_COLOR
-        },
-        position,
-        size,
-        &c,
-        g,
-    );
-    if size > 3 {
-        draw_hollow_circle(
-            &c,
-            g,
-            NOM_BORDER_COLOR,
-            [position[0] as f64, position[1] as f64],
-            (size / 2) as f64,
-            100,
-        );
-    }
-}
-
-fn draw_circle(color: Color, position: [u64; 2], size: u64, c: &Context, g: &mut G2d) {
+pub fn draw_circle(color: Color, position: [u64; 2], size: u64, c: &Context, g: &mut G2d) {
     ellipse(
         color,
         [
@@ -53,7 +17,7 @@ fn draw_circle(color: Color, position: [u64; 2], size: u64, c: &Context, g: &mut
     );
 }
 
-fn draw_hollow_circle(
+pub fn draw_hollow_circle(
     context: &Context,
     graphics: &mut G2d,
     color: [f32; 4],
@@ -73,6 +37,27 @@ fn draw_hollow_circle(
         let y2 = cy + radius * theta2.sin();
         line(color, 1.0, [x1, y1, x2, y2], context.transform, graphics);
     }
+}
+
+pub fn draw_ellipse(
+    color: Color,
+    position: [u64; 2],
+    size: [u64; 2],
+    rotation: u64,
+    c: &Context,
+    g: &mut G2d,
+) {
+    let rotation_angle = (rotation as f64).to_radians();
+    let transform = c
+        .transform
+        .trans(position[0] as f64, position[1] as f64)
+        .rot_rad(rotation_angle);
+    ellipse(
+        color,
+        [0.0, 0.0, size[0] as f64, size[1] as f64],
+        transform,
+        g,
+    );
 }
 
 pub fn draw_detection_range(cx: f64, cy: f64, r: f64, color: [f32; 4], con: &Context, g: &mut G2d) {
