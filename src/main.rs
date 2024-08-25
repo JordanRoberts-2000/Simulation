@@ -1,6 +1,7 @@
 extern crate piston_window;
 extern crate rand;
 
+mod config;
 mod draw;
 mod food;
 mod nom;
@@ -8,9 +9,8 @@ mod simulation;
 
 use piston_window::*;
 
+use crate::config::WINDOW_SIZE;
 use crate::simulation::Simulation;
-
-const WINDOW_SIZE: [f64; 2] = [900.0, 600.0];
 
 fn main() {
     let mut window: PistonWindow = WindowSettings::new("Simulation", WINDOW_SIZE)

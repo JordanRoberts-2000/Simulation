@@ -1,6 +1,5 @@
 use piston_window::types::Color;
 use piston_window::*;
-use rand::{thread_rng, Rng};
 
 use crate::draw::draw_detection_range;
 use crate::food::Food;
@@ -15,21 +14,13 @@ pub struct Simulation {
 
 impl Simulation {
     pub fn new(starting_noms_amount: u64, starting_food_amount: u64) -> Simulation {
-        let border_offset: u64 = 8;
-        let mut rng = thread_rng();
         let mut nom_vec: Vec<Nom> = Vec::new();
         for _i in 0..starting_noms_amount {
-            nom_vec.push(Nom::new([
-                rng.gen_range(border_offset..900 - border_offset),
-                rng.gen_range(border_offset..600 - border_offset),
-            ]));
+            nom_vec.push(Nom::new());
         }
         let mut food_vec: Vec<Food> = Vec::new();
         for _i in 0..starting_food_amount {
-            food_vec.push(Food::new([
-                rng.gen_range(border_offset..900 - border_offset),
-                rng.gen_range(border_offset..600 - border_offset),
-            ]));
+            food_vec.push(Food::new());
         }
         return Simulation {
             nom_arr: nom_vec,

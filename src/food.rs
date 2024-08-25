@@ -2,6 +2,7 @@ use piston_window::types::Color;
 use piston_window::{Context, G2d};
 use rand::{thread_rng, Rng};
 
+use crate::config::WINDOW_SIZE;
 use crate::draw::{draw_circle, draw_ellipse};
 
 const FOOD_SIZE: u64 = 4;
@@ -13,8 +14,16 @@ pub struct Food {
 }
 
 impl Food {
-    pub fn new(position: [u64; 2]) -> Food {
-        return Food { position };
+    pub fn new() -> Food {
+        let mut rng = thread_rng();
+        let border_spawn_offset = 8;
+        let position_x =
+            rng.gen_range(border_spawn_offset..(WINDOW_SIZE[0] as u64) - border_spawn_offset);
+        let position_y =
+            rng.gen_range(border_spawn_offset..(WINDOW_SIZE[1] as u64) - border_spawn_offset);
+        return Food {
+            position: [position_x, position_y],
+        };
     }
 
     pub fn draw(position: [u64; 2], c: &Context, g: &mut G2d) {
