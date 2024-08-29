@@ -3,43 +3,53 @@ use piston_window::*;
 use piston_window::{ellipse, line, Context, G2d};
 use std::f64::consts::PI;
 
+pub fn draw_line(
+    color: Color,
+    coord_1: [u64; 2],
+    coord_2: [u64; 2],
+    thickness: f64,
+    c: &Context,
+    g: &mut G2d,
+) {
+    let (x1, y1) = (coord_1[0] as f64, coord_1[1] as f64);
+    let (x2, y2) = (coord_2[0] as f64, coord_2[1] as f64);
+    line(color, thickness, [x1, y1, x2, y2], c.transform, g);
+}
+
 pub fn draw_circle(color: Color, position: [u64; 2], size: u64, c: &Context, g: &mut G2d) {
-    // - size / 2 makes the position parameter the center of the circle
-    if position[0] < size / 2 || position[1] < size / 2 {
-        panic!("draw_circle: attempted to spawn too close to border");
-    }
+    let x = position[0]
+        .checked_sub(size / 2) // position parameter now circle center
+        .expect("draw_circle: underflow detected on X coordinate");
+    let y = position[1]
+        .checked_sub(size / 2)
+        .expect("draw_circle: underflow detected on X coordinate");
     ellipse(
         color,
-        [
-            (position[0] - size / 2) as f64,
-            (position[1] - size / 2) as f64,
-            size as f64,
-            size as f64,
-        ],
+        [x as f64, y as f64, size as f64, size as f64],
         c.transform,
         g,
     );
 }
 
 pub fn draw_hollow_circle(
-    context: &Context,
-    graphics: &mut G2d,
-    color: [f32; 4],
-    center: [f64; 2],
-    radius: f64,
+    color: Color,
+    position: [u64; 2],
+    size: u64,
+    thickness: f64,
     segments: usize,
+    c: &Context,
+    g: &mut G2d,
 ) {
-    let (cx, cy) = (center[0], center[1]);
+    let (cx, cy) = (position[0] as f64, position[1] as f64);
     let step = 2.0 * PI / segments as f64;
-
     for i in 0..segments {
         let theta1 = i as f64 * step;
         let theta2 = (i + 1) as f64 * step;
-        let x1 = cx + radius * theta1.cos();
-        let y1 = cy + radius * theta1.sin();
-        let x2 = cx + radius * theta2.cos();
-        let y2 = cy + radius * theta2.sin();
-        line(color, 1.0, [x1, y1, x2, y2], context.transform, graphics);
+        let x1 = cx + ((size / 2) as f64) * theta1.cos();
+        let y1 = cy + ((size / 2) as f64) * theta1.sin();
+        let x2 = cx + ((size / 2) as f64) * theta2.cos();
+        let y2 = cy + ((size / 2) as f64) * theta2.sin();
+        line(color, thickness, [x1, y1, x2, y2], c.transform, g);
     }
 }
 

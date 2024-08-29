@@ -17,7 +17,7 @@ fn main() {
         .exit_on_esc(true)
         .build()
         .unwrap();
-    let mut simulation = Simulation::new(4, 40);
+    let mut simulation = Simulation::new(4, 6);
     while let Some(event) = window.next() {
         // if let Some(Button::Keyboard(key)) = event.press_args() {
         //     simulation.key_pressed(key);
@@ -26,8 +26,8 @@ fn main() {
             simulation.draw(&c, g);
         });
 
-        // event.update(|arg| {
-        //     simulation.update(arg.dt);
-        // });
+        event.update(|arg| {
+            simulation.update(arg.dt);
+        });
     }
 }

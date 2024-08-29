@@ -42,13 +42,23 @@ impl Nom {
         );
         if size > 3 {
             draw_hollow_circle(
+                NOM_BORDER_COLOR,
+                [position[0], position[1]],
+                size,
+                1.0,
+                100,
                 &c,
                 g,
-                NOM_BORDER_COLOR,
-                [position[0] as f64, position[1] as f64],
-                (size / 2) as f64,
-                100,
             );
         }
+        draw_hollow_circle(
+            [1.0, 1.0, 1.0, 1.0],
+            [position[0], position[1]],
+            100,
+            0.5,
+            100,
+            c,
+            g,
+        );
     }
 }
