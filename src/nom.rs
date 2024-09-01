@@ -2,7 +2,7 @@ use ::rand::{thread_rng, Rng};
 use macroquad::prelude::*;
 use std::f32::consts::PI;
 
-use crate::plant::Plant;
+// use crate::plants::Plant;
 
 const NOM_SPAWN_SIZE: f32 = 14.;
 const NOM_SPAWN_SPEED: f32 = 40.;
@@ -22,11 +22,11 @@ pub struct Nom {
     pub speed: f32,
     target_position: Option<[f32; 2]>,
     target_type: Option<TargetType>,
-    view_detection_visuals: bool,
+    testing_visuals: bool,
 }
 
 impl Nom {
-    pub fn new(view_detection_visuals: bool) -> Nom {
+    pub fn new(testing_visuals: bool) -> Nom {
         let mut rng = thread_rng();
         let border_spawn_offset = 8;
         let position_x =
@@ -39,7 +39,7 @@ impl Nom {
             speed: NOM_SPAWN_SPEED,
             target_position: None,
             target_type: None,
-            view_detection_visuals,
+            testing_visuals,
         };
     }
 
@@ -62,7 +62,7 @@ impl Nom {
                 NOM_COLOR,
             );
         }
-        if self.view_detection_visuals {
+        if self.testing_visuals {
             draw_circle_lines(
                 self.position[0],
                 self.position[1],
@@ -104,46 +104,46 @@ impl Nom {
             self.position[1] += direction_y_normalized * travel_distance;
         }
     }
-    pub fn check_detection_range(&mut self, food_arr: &Vec<Plant>) {
-        // is threat near me?
+    // pub fn check_detection_range(&mut self, food_arr: &Vec<Plant>) {
+    //     // is threat near me?
 
-        // is food near me?
-        // toDo: improve logic so all food in range is identified, then closest is chosen then return prematurely,
-        //  also check if food is now being targeted by a closer nom
-        // for food in food_arr {
-        //     let dx = food.position[0] as f64 - self.position[0] as f64;
-        //     let dy = food.position[1] as f64 - self.position[1] as f64;
-        //     let distance = (dx * dx + dy * dy).sqrt();
-        //     if distance <= NOM_SPAWN_DETECTION_RADIUS as f64 / 2.0 {
-        //         self.target_position = Some(food.position);
-        //     }
-        // }
+    //     // is food near me?
+    //     // toDo: improve logic so all food in range is identified, then closest is chosen then return prematurely,
+    //     //  also check if food is now being targeted by a closer nom
+    //     // for food in food_arr {
+    //     //     let dx = food.position[0] as f64 - self.position[0] as f64;
+    //     //     let dy = food.position[1] as f64 - self.position[1] as f64;
+    //     //     let distance = (dx * dx + dy * dy).sqrt();
+    //     //     if distance <= NOM_SPAWN_DETECTION_RADIUS as f64 / 2.0 {
+    //     //         self.target_position = Some(food.position);
+    //     //     }
+    //     // }
 
-        // set to random position
-        if self.target_position.is_none() {
-            let mut rng = thread_rng();
-            let radius: f32 = 50.0;
-            let margin: f32 = 10.0;
+    //     // set to random position
+    //     if self.target_position.is_none() {
+    //         let mut rng = thread_rng();
+    //         let radius: f32 = 50.0;
+    //         let margin: f32 = 10.0;
 
-            loop {
-                // Generate a random angle between 0 and 2π radians
-                let angle: f32 = rng.gen_range(0.0..2.0 * PI);
+    //         loop {
+    //             // Generate a random angle between 0 and 2π radians
+    //             let angle: f32 = rng.gen_range(0.0..2.0 * PI);
 
-                // Calculate the x and y coordinates on the circumference
-                let target_x = self.position[0] + radius * angle.cos();
-                let target_y = self.position[1] + radius * angle.sin();
+    //             // Calculate the x and y coordinates on the circumference
+    //             let target_x = self.position[0] + radius * angle.cos();
+    //             let target_y = self.position[1] + radius * angle.sin();
 
-                // Check if the target position is within 10px of the screen borders
-                if target_x > margin
-                    && target_x < (screen_width() - margin)
-                    && target_y > margin
-                    && target_y < (screen_height() - margin)
-                {
-                    // Valid position, set as target_position
-                    self.target_position = Some([target_x, target_y]);
-                    break;
-                }
-            }
-        }
-    }
+    //             // Check if the target position is within 10px of the screen borders
+    //             if target_x > margin
+    //                 && target_x < (screen_width() - margin)
+    //                 && target_y > margin
+    //                 && target_y < (screen_height() - margin)
+    //             {
+    //                 // Valid position, set as target_position
+    //                 self.target_position = Some([target_x, target_y]);
+    //                 break;
+    //             }
+    //         }
+    //     }
+    // }
 }
