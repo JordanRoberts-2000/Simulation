@@ -2,6 +2,7 @@ use crate::simulation::{Simulation, SimulationType};
 use macroquad::prelude::*;
 
 mod dev_tools;
+mod entity_stats;
 mod nom;
 mod plants;
 mod simulation;
@@ -27,7 +28,7 @@ async fn main() {
         // let center_x = screen_width() / 2.0;
         // let center_y = screen_height() / 2.0;
 
-        // let plant_color: [f32; 3] = [0.0, 0.7, 0.0];
+        // let plant_color: [f32; 3] = [0.0, 0.5, 0.5];
         // let plant_color_2: [f32; 3] = [0.0, 0.0, 0.85];
 
         // // Draw a series of circles to create a blur effect

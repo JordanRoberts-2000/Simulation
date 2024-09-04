@@ -2,11 +2,12 @@ use macroquad::prelude::*;
 use miniquad::window::quit;
 
 use crate::dev_tools::DevTools;
+use crate::entity_stats::EntityStats;
 use crate::nom::Nom;
 use crate::plants::{PlantSpawn, Plants};
 
 const PROD_PLANTS: PlantSpawn = PlantSpawn {
-    xs: 20,
+    xs: 1,
     sm: 20,
     md: 2,
     lg: 1,
@@ -25,7 +26,8 @@ pub struct Simulation {
     plants: Plants,
     testing_visuals: bool,
     dev_tools: DevTools,
-    stats_active: bool,
+    environment_stats: bool,
+    entity_stats: EntityStats,
 }
 
 impl Simulation {
@@ -37,7 +39,8 @@ impl Simulation {
                     plants: Plants::empty(),
                     testing_visuals,
                     dev_tools: DevTools::new(),
-                    stats_active: false,
+                    environment_stats: false,
+                    entity_stats: EntityStats::new(),
                 };
                 // custom_sim.spawn_plant(size, position);
                 // custom_sim.spawn_plants(PlantSpawn {
@@ -50,25 +53,28 @@ impl Simulation {
                 return custom_sim;
             }
             SimulationType::Production => Simulation {
-                noms: Vec::new(),
+                noms: vec![Nom::new(vec2(200., 200.), true)],
                 plants: Plants::new(PROD_PLANTS),
                 testing_visuals,
                 dev_tools: DevTools::new(),
-                stats_active: false,
+                environment_stats: false,
+                entity_stats: EntityStats::new(),
             },
             SimulationType::NomsOnly => Simulation {
                 noms: Vec::new(),
                 plants: Plants::empty(),
                 testing_visuals,
                 dev_tools: DevTools::new(),
-                stats_active: false,
+                environment_stats: false,
+                entity_stats: EntityStats::new(),
             },
             SimulationType::PlantOnly => Simulation {
                 noms: Vec::new(),
                 plants: Plants::new(PROD_PLANTS),
                 testing_visuals,
                 dev_tools: DevTools::new(),
-                stats_active: false,
+                environment_stats: false,
+                entity_stats: EntityStats::new(),
             },
             _ => panic!("Invalid simulation type"),
         };
@@ -92,22 +98,28 @@ impl Simulation {
             nom.draw();
         }
         self.dev_tools.draw();
-        if self.stats_active || self.dev_tools.devtools_active {
+        self.entity_stats.draw(&self.noms);
+
+        if self.environment_stats || self.dev_tools.devtools_active {
             self.draw_stats();
         }
     }
 
     pub fn update(&mut self) {
         for nom in &mut self.noms {
-            // nom.check_detection_range(&self.plants.plant_vec);
-            nom.move_forward();
+            nom.update();
         }
+        // collision detection:
+        // 1. make sure each pair is only checked once, a -> b, b !-> a;
+        // 2. AABB broad detection
+        // 3. precise detection w/distance
+        // 4. spacial hashmaps
     }
 
     pub fn key_pressed(&mut self) {
         self.dev_tools.handle_inputs();
         if is_key_pressed(KeyCode::I) {
-            self.stats_active = !self.stats_active;
+            self.environment_stats = !self.environment_stats;
         }
         if is_key_pressed(KeyCode::Escape) {
             quit();
@@ -127,7 +139,7 @@ impl Simulation {
 
     pub fn spawn_nom(&mut self, starting_noms_amount: u32) {
         for _i in 0..starting_noms_amount {
-            self.noms.push(Nom::new(self.testing_visuals));
+            // self.noms.push(Nom::new());
         }
     }
 }
