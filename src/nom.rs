@@ -16,7 +16,7 @@ const NOM_SPAWN_DETECTION_RADIUS: f32 = 200.;
 // DEFAULT
 const NOM_SPAWN_MASS: f32 = 16.;
 const NOM_BORDER_THICKNESS: f32 = 2.0;
-const NOM_SPAWN_SPEED: f32 = 200.;
+const NOM_SPAWN_SPEED: f32 = 50.;
 const NOM_SPAWN_SPRINT_SPEED: f32 = 200.;
 const NOM_BORDER_COLOR: Color = Color::new(0.9961, 0.0, 0.9961, 1.0);
 const NOM_COLOR: Color = Color::new(0.2, 0.0, 0.2, 1.0);
@@ -47,6 +47,7 @@ pub struct Nom {
     acceleration: f32,
     turning_speed: f32,
     panicking: bool,
+    pub temp_is_colliding: bool,
     player_controlled: bool,
 }
 
@@ -63,6 +64,7 @@ impl Nom {
             acceleration: NOM_SPAWN_SPEED / 2.0,
             turning_speed: 180.0, // Degrees per second
             panicking: false,
+            temp_is_colliding: false,
             player_controlled,
         }
     }
@@ -79,14 +81,20 @@ impl Nom {
                 self.panicking = false;
             }
         }
-        self.update_orientation(&delta_time);
-        self.update_position(&delta_time);
-        self.check_collisions();
+        if self.player_controlled {
+            self.update_orientation(&delta_time);
+            self.update_position(&delta_time);
+        }
     }
 
     pub fn draw(&self) {
         // Draw the circle representing the object
-        draw_circle(self.position.x, self.position.y, self.mass / 2.0, GREEN);
+        draw_circle(
+            self.position.x,
+            self.position.y,
+            self.mass / 2.0,
+            if self.temp_is_colliding { RED } else { GREEN },
+        );
 
         // Draw the direction the object is facing (orientation line)
         let line_length = 30.0;
@@ -102,7 +110,27 @@ impl Nom {
         self.position.y += self.current_speed * self.orientation.to_radians().sin() * delta_time;
     }
 
-    pub fn check_collisions(&mut self) {}
+    pub fn check_collision(&mut self, nom: &mut Nom) -> bool {
+        if !self.bounding_box_collision(nom) {
+            return false;
+        }
+        return self.circle_collision(nom);
+    }
+
+    pub fn bounding_box_collision(&mut self, nom: &mut Nom) -> bool {
+        !(self.position.x + self.mass / 2.0 < nom.position.x - nom.mass / 2.0 || // Right of self.position is left of nom.position
+        self.position.x - self.mass / 2.0 > nom.position.x + nom.mass / 2.0 || // Left of self.position is right of nom.position
+        self.position.y + self.mass / 2.0 < nom.position.y - nom.mass / 2.0 || // Bottom of self.position is above nom.position
+        self.position.y - self.mass / 2.0 > nom.position.y + nom.mass / 2.0) // Top of circle1 is below circle2
+    }
+
+    pub fn circle_collision(&mut self, nom: &mut Nom) -> bool {
+        let dx = nom.position.x - self.position.x;
+        let dy = nom.position.y - self.position.y;
+        let distance_squared = dx * dx + dy * dy;
+        let radii_sum = self.mass / 2.0 + nom.mass / 2.0;
+        return distance_squared <= radii_sum * radii_sum;
+    }
 
     pub fn update_orientation(&mut self, delta_time: &f32) {
         let dx = self.target_position.x - self.position.x;

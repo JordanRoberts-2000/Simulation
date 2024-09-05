@@ -53,7 +53,21 @@ impl Simulation {
                 return custom_sim;
             }
             SimulationType::Production => Simulation {
-                noms: vec![Nom::new(vec2(200., 200.), true)],
+                noms: vec![
+                    Nom::new(vec2(200., 200.), true),
+                    Nom::new(vec2(500., 200.), false),
+                    Nom::new(vec2(500., 300.), false),
+                    Nom::new(vec2(500., 400.), false),
+                    Nom::new(vec2(500., 500.), false),
+                    Nom::new(vec2(500., 600.), false),
+                    Nom::new(vec2(500., 700.), false),
+                    Nom::new(vec2(700., 500.), false),
+                    Nom::new(vec2(700., 600.), false),
+                    Nom::new(vec2(700., 400.), false),
+                    Nom::new(vec2(700., 300.), false),
+                    Nom::new(vec2(700., 200.), false),
+                    Nom::new(vec2(700., 100.), false),
+                ],
                 plants: Plants::new(PROD_PLANTS),
                 testing_visuals,
                 dev_tools: DevTools::new(),
@@ -106,14 +120,33 @@ impl Simulation {
     }
 
     pub fn update(&mut self) {
+        let noms_len = self.noms.len();
         for nom in &mut self.noms {
             nom.update();
         }
+        // check in pairs, avoid duplicate checks: a -> b & b -> a;
+        for i in 0..noms_len {
+            let mut is_colliding = false; // Track whether nom_a has collided with any other nom
+            for j in (i + 1)..noms_len {
+                let (left, right) = self.noms.split_at_mut(j);
+                let nom_a = &mut left[i];
+                let nom_b = &mut right[0];
+
+                if nom_a.check_collision(nom_b) {
+                    // If a collision is detected, mark it
+                    is_colliding = true;
+                    nom_b.temp_is_colliding = true; // Also mark nom_b as colliding
+                }
+            }
+            // After checking all other noms, update nom_a's collision status
+            self.noms[i].temp_is_colliding = is_colliding;
+        }
         // collision detection:
-        // 1. make sure each pair is only checked once, a -> b, b !-> a;
-        // 2. AABB broad detection
-        // 3. precise detection w/distance
-        // 4. spacial hashmaps
+        // 1.visibly show collision
+        // 1. check *mut is nessesary
+        // 2. spacial hashmaps
+        // 3. collision w/wall
+        // ------------------------
     }
 
     pub fn key_pressed(&mut self) {
