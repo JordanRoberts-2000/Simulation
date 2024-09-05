@@ -93,7 +93,11 @@ impl Nom {
             self.position.x,
             self.position.y,
             self.mass / 2.0,
-            if self.temp_is_colliding { RED } else { GREEN },
+            if self.temp_is_colliding && self.player_controlled {
+                RED
+            } else {
+                GREEN
+            },
         );
 
         // Draw the direction the object is facing (orientation line)

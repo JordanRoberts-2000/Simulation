@@ -42,13 +42,6 @@ impl Plants {
             cluster_vec,
         };
     }
-
-    pub fn empty() -> Self {
-        Self {
-            plant_vec: Vec::new(),
-            cluster_vec: Vec::new(),
-        }
-    }
 }
 
 // =====================================================================================

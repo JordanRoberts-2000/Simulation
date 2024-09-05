@@ -3,6 +3,7 @@ use macroquad::prelude::*;
 pub struct DevTools {
     pub devtools_active: bool,
     command_line: String,
+    testing_visuals: bool,
 }
 
 impl DevTools {
@@ -10,6 +11,7 @@ impl DevTools {
         Self {
             devtools_active: false,
             command_line: String::new(),
+            testing_visuals: false,
         }
     }
 
