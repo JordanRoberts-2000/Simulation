@@ -21,7 +21,7 @@ impl DevTools {
     }
 
     pub fn handle_inputs(&mut self) {
-        if is_key_pressed(KeyCode::LeftShift) {
+        if is_key_pressed(KeyCode::D) {
             self.devtools_active = !self.devtools_active;
         }
         if self.devtools_active {

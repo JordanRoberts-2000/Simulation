@@ -1,6 +1,8 @@
 use ::rand::{thread_rng, Rng};
 use macroquad::prelude::*;
+use std::cell::RefCell;
 use std::f32::consts::PI;
+use std::rc::Rc;
 
 // use crate::plants::Plant;
 
@@ -14,7 +16,7 @@ const NOM_SPAWN_DETECTION_RADIUS: f32 = 200.;
 // const NOM_BORDER_COLOR: Color = Color::new(0.9764706, 0.2, 0.91764706, 0.5);
 
 // DEFAULT
-const NOM_SPAWN_MASS: f32 = 16.;
+const NOM_SPAWN_SIZE: f32 = 16.;
 const NOM_BORDER_THICKNESS: f32 = 2.0;
 const NOM_SPAWN_SPEED: f32 = 50.;
 const NOM_SPAWN_SPRINT_SPEED: f32 = 200.;
@@ -36,9 +38,10 @@ pub struct Stats {
     pub orientation: f32,
 }
 
+#[derive(Clone)]
 pub struct Nom {
-    mass: f32,
-    position: Vec2,
+    pub size: f32,
+    pub position: Vec2,
     orientation: f32,
     target_position: Vec2,
     target_orientation: f32,
@@ -54,7 +57,11 @@ pub struct Nom {
 impl Nom {
     pub fn new(position: Vec2, player_controlled: bool) -> Nom {
         Nom {
-            mass: NOM_SPAWN_MASS,
+            size: if player_controlled {
+                NOM_SPAWN_SIZE
+            } else {
+                thread_rng().gen_range(8..24) as f32
+            },
             position,
             target_position: Vec2::ZERO,
             current_speed: 0.0, // Scalar speed
@@ -84,6 +91,7 @@ impl Nom {
         if self.player_controlled {
             self.update_orientation(&delta_time);
             self.update_position(&delta_time);
+            self.update_grid_cell();
         }
     }
 
@@ -92,7 +100,7 @@ impl Nom {
         draw_circle(
             self.position.x,
             self.position.y,
-            self.mass / 2.0,
+            self.size / 2.0,
             if self.temp_is_colliding && self.player_controlled {
                 RED
             } else {
@@ -114,25 +122,29 @@ impl Nom {
         self.position.y += self.current_speed * self.orientation.to_radians().sin() * delta_time;
     }
 
-    pub fn check_collision(&mut self, nom: &mut Nom) -> bool {
+    pub fn update_grid_cell(&mut self) {
+        let grid_cell_size: f32 = 30.0;
+    }
+
+    pub fn check_collision(&self, nom: &Nom) -> bool {
         if !self.bounding_box_collision(nom) {
             return false;
         }
         return self.circle_collision(nom);
     }
 
-    pub fn bounding_box_collision(&mut self, nom: &mut Nom) -> bool {
-        !(self.position.x + self.mass / 2.0 < nom.position.x - nom.mass / 2.0 || // Right of self.position is left of nom.position
-        self.position.x - self.mass / 2.0 > nom.position.x + nom.mass / 2.0 || // Left of self.position is right of nom.position
-        self.position.y + self.mass / 2.0 < nom.position.y - nom.mass / 2.0 || // Bottom of self.position is above nom.position
-        self.position.y - self.mass / 2.0 > nom.position.y + nom.mass / 2.0) // Top of circle1 is below circle2
+    pub fn bounding_box_collision(&self, nom: &Nom) -> bool {
+        !(self.position.x + self.size / 2.0 < nom.position.x - nom.size / 2.0 || // Right of self.position is left of nom.position
+        self.position.x - self.size / 2.0 > nom.position.x + nom.size / 2.0 || // Left of self.position is right of nom.position
+        self.position.y + self.size / 2.0 < nom.position.y - nom.size / 2.0 || // Bottom of self.position is above nom.position
+        self.position.y - self.size / 2.0 > nom.position.y + nom.size / 2.0) // Top of circle1 is below circle2
     }
 
-    pub fn circle_collision(&mut self, nom: &mut Nom) -> bool {
+    pub fn circle_collision(&self, nom: &Nom) -> bool {
         let dx = nom.position.x - self.position.x;
         let dy = nom.position.y - self.position.y;
         let distance_squared = dx * dx + dy * dy;
-        let radii_sum = self.mass / 2.0 + nom.mass / 2.0;
+        let radii_sum = self.size / 2.0 + nom.size / 2.0;
         return distance_squared <= radii_sum * radii_sum;
     }
 

@@ -5,6 +5,7 @@ mod dev_tools;
 mod entity_stats;
 mod nom;
 mod plants;
+mod quadtree;
 mod simulation;
 
 fn window_conf() -> Conf {
