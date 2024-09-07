@@ -75,7 +75,7 @@ impl Quadtree {
             self.bounds.w,
             self.bounds.h,
             1.0,
-            WHITE,
+            DARKGRAY,
         );
         if let Some(ref nodes) = self.nodes {
             for node in nodes.iter() {

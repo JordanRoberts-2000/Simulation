@@ -7,6 +7,7 @@ mod nom;
 mod plants;
 mod quadtree;
 mod simulation;
+mod utils;
 
 fn window_conf() -> Conf {
     Conf {
