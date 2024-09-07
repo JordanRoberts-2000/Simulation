@@ -55,13 +55,9 @@ pub struct Nom {
 }
 
 impl Nom {
-    pub fn new(position: Vec2, player_controlled: bool) -> Nom {
-        Nom {
-            size: if player_controlled {
-                NOM_SPAWN_SIZE
-            } else {
-                thread_rng().gen_range(8..24) as f32
-            },
+    pub fn new(position: Vec2, player_controlled: bool) -> Self {
+        Self {
+            size: 24.,
             position,
             target_position: Vec2::ZERO,
             current_speed: 0.0, // Scalar speed
@@ -91,7 +87,28 @@ impl Nom {
         if self.player_controlled {
             self.update_orientation(&delta_time);
             self.update_position(&delta_time);
-            self.update_grid_cell();
+        }
+    }
+
+    pub fn spawn_random() -> Self {
+        let mut rng = thread_rng();
+        let size: f32 = 16.;
+        Self {
+            size,
+            position: vec2(
+                rng.gen_range(size / 2.0..screen_width()),
+                rng.gen_range(size / 2.0..screen_height()),
+            ),
+            target_position: Vec2::ZERO,
+            current_speed: 0.0, // Scalar speed
+            orientation: 0.0,   // Initial orientation
+            target_orientation: 0.0,
+            max_speed: NOM_SPAWN_SPEED,
+            acceleration: NOM_SPAWN_SPEED / 2.0,
+            turning_speed: 180.0, // Degrees per second
+            panicking: false,
+            temp_is_colliding: false,
+            player_controlled: false,
         }
     }
 
@@ -120,10 +137,6 @@ impl Nom {
             (self.current_speed + self.acceleration * delta_time).min(self.max_speed);
         self.position.x += self.current_speed * self.orientation.to_radians().cos() * delta_time;
         self.position.y += self.current_speed * self.orientation.to_radians().sin() * delta_time;
-    }
-
-    pub fn update_grid_cell(&mut self) {
-        let grid_cell_size: f32 = 30.0;
     }
 
     pub fn check_collision(&self, nom: &Nom) -> bool {
