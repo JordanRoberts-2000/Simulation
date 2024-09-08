@@ -24,33 +24,31 @@ pub struct Simulation {
     dev_tools: DevTools,
     environment_stats: bool,
     entity_stats: EntityStats,
-    quadtree: Quadtree,
+    quadtree: Rc<RefCell<Quadtree>>,
 }
 
 impl Simulation {
     pub fn new() -> Simulation {
         let noms = Rc::new(RefCell::new(vec![
-            Rc::new(RefCell::new(Nom::new(vec2(200., 200.), true))),
-            Rc::new(RefCell::new(Nom::new(vec2(300., 300.), false))),
-            Rc::new(RefCell::new(Nom::new(vec2(100., 100.), false))),
-            Rc::new(RefCell::new(Nom::new(vec2(150., 150.), false))),
+            Rc::new(RefCell::new(Nom::new(vec2(200., 166.)))),
+            Rc::new(RefCell::new(Nom::new(vec2(300., 340.)))),
+            Rc::new(RefCell::new(Nom::new(vec2(100., 100.)))),
+            Rc::new(RefCell::new(Nom::new(vec2(150., 150.)))),
             // ... other noms
         ]));
-
-        let dev_tools = DevTools::new(noms.clone());
-
-        let mut sim = Simulation {
+        let quadtree = Rc::new(RefCell::new(Quadtree::new()));
+        let sim = Simulation {
             noms: noms.clone(), // Use the same noms in Simulation
             plants: Plants::new(DEFAULT_PLANTS_SPAWN),
-            dev_tools,
+            dev_tools: DevTools::new(noms.clone(), quadtree.clone()),
             environment_stats: false,
             entity_stats: EntityStats::new(),
-            quadtree: Quadtree::new(),
+            quadtree: quadtree.clone(),
         };
 
         // Insert noms into the quadtree
         for nom in noms.borrow().iter() {
-            sim.quadtree.insert(Rc::clone(nom));
+            sim.quadtree.borrow_mut().insert(Rc::clone(nom));
         }
 
         sim
@@ -85,12 +83,14 @@ impl Simulation {
             screen_height(),
             Color::new(0.1020, 0.1804, 0.0196, 0.15),
         );
-        self.quadtree.draw();
+        self.quadtree
+            .borrow()
+            .draw(self.dev_tools.quadtree_visuals_active.clone());
         for plant in &self.plants.plant_vec {
             plant.draw();
         }
         for nom in self.noms.borrow().iter() {
-            nom.borrow().draw();
+            nom.borrow().draw(self.dev_tools.nom_visuals_active.clone());
         }
         self.dev_tools.draw();
         // self.entity_stats.draw(&self.noms);

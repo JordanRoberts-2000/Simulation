@@ -8,18 +8,7 @@ pub struct Toggles {
 impl Toggles {
     pub fn new() -> Self {
         Self {
-            toggles: vec![
-                ToggleSwitch::new(
-                    vec2(350., 25.),
-                    Box::new(|| println!("Quadtree turned on")),
-                    Box::new(|| println!("Quadtree turned of")),
-                ),
-                ToggleSwitch::new(
-                    vec2(350., 75.),
-                    Box::new(|| println!("NomVisuals turned on")),
-                    Box::new(|| println!("NomVisuals turned of")),
-                ),
-            ],
+            toggles: Vec::new(),
         }
     }
 
@@ -33,5 +22,15 @@ impl Toggles {
         for toggle in &self.toggles {
             toggle.draw();
         }
+    }
+
+    pub fn add_toggle(
+        &mut self,
+        position: Vec2,
+        on_toggle_on: Box<dyn Fn()>,
+        on_toggle_off: Box<dyn Fn()>,
+    ) {
+        self.toggles
+            .push(ToggleSwitch::new(position, on_toggle_on, on_toggle_off));
     }
 }

@@ -5,7 +5,7 @@ use std::rc::Rc;
 use crate::nom::Nom;
 
 const MAX_OBJECTS: usize = 4;
-const MAX_LEVELS: usize = 5;
+const MAX_LEVELS: usize = 8;
 
 pub struct Quadtree {
     level: usize,
@@ -68,18 +68,20 @@ impl Quadtree {
         }
     }
 
-    pub fn draw(&self) {
-        draw_rectangle_lines(
-            self.bounds.x,
-            self.bounds.y,
-            self.bounds.w,
-            self.bounds.h,
-            1.0,
-            DARKGRAY,
-        );
-        if let Some(ref nodes) = self.nodes {
-            for node in nodes.iter() {
-                node.draw();
+    pub fn draw(&self, show_visuals: Rc<RefCell<bool>>) {
+        if *show_visuals.borrow() {
+            draw_rectangle_lines(
+                self.bounds.x,
+                self.bounds.y,
+                self.bounds.w,
+                self.bounds.h,
+                1.0,
+                DARKGRAY,
+            );
+            if let Some(ref nodes) = self.nodes {
+                for node in nodes.iter() {
+                    node.draw(show_visuals.clone());
+                }
             }
         }
     }
@@ -132,14 +134,14 @@ impl Quadtree {
     }
 
     // Retrieve objects that could potentially collide with a given object
-    // fn retrieve(&self, nom: &Nom, objects: &mut Vec<Nom>) {
-    //     if let Some(ref nodes) = self.nodes {
-    //         if let Some(index) = self.get_index(nom) {
-    //             nodes[index].retrieve(nom, objects);
-    //         }
-    //     }
+    pub fn retrieve(&self, return_objects: &mut Vec<Rc<RefCell<Nom>>>, nom: &Nom) {
+        if let Some(ref nodes) = self.nodes {
+            let index = self.get_index(nom);
+            if let Some(i) = index {
+                nodes[i].retrieve(return_objects, nom);
+            }
+        }
 
-    //     // Add all objects from this node
-    //     objects.extend(&self.objects);
-    // }
+        return_objects.extend(self.objects.iter().cloned())
+    }
 }

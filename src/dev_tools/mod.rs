@@ -2,10 +2,10 @@ use command_line::CommandLine;
 use macroquad::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
-use toggles::Toggles;
 
 use crate::nom::Nom;
-use crate::utils::toggle::ToggleSwitch;
+use crate::quadtree::Quadtree;
+use toggles::Toggles;
 
 mod command_line;
 mod toggles;
@@ -13,20 +13,59 @@ mod toggles;
 pub struct DevTools {
     devtools_active: bool,
     command_line: CommandLine,
-    testing_visuals: bool,
+    pub nom_visuals_active: Rc<RefCell<bool>>,
+    pub quadtree_visuals_active: Rc<RefCell<bool>>,
     toggles: Toggles,
     noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
+    quadtree: Rc<RefCell<Quadtree>>,
 }
 
 impl DevTools {
-    pub fn new(noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>) -> Self {
-        Self {
+    pub fn new(noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>, quadtree: Rc<RefCell<Quadtree>>) -> Self {
+        let nom_visuals_active = Rc::new(RefCell::new(false));
+        let quadtree_visuals_active = Rc::new(RefCell::new(false));
+        let mut devtools = DevTools {
             devtools_active: false,
             command_line: CommandLine::new(),
-            testing_visuals: false,
+            nom_visuals_active: nom_visuals_active.clone(),
+            quadtree_visuals_active: quadtree_visuals_active.clone(),
             toggles: Toggles::new(),
             noms,
-        }
+            quadtree: quadtree.clone(),
+        };
+
+        devtools.toggles.add_toggle(
+            vec2(350., 75.),
+            Box::new({
+                let nom_visuals_active = nom_visuals_active.clone();
+                move || {
+                    *nom_visuals_active.borrow_mut() = true;
+                }
+            }),
+            Box::new({
+                let nom_visuals_active = nom_visuals_active.clone();
+                move || {
+                    *nom_visuals_active.borrow_mut() = false;
+                }
+            }),
+        );
+        devtools.toggles.add_toggle(
+            vec2(350., 35.),
+            Box::new({
+                let quadtree_visuals_active = quadtree_visuals_active.clone();
+                move || {
+                    *quadtree_visuals_active.borrow_mut() = true;
+                }
+            }),
+            Box::new({
+                let quadtree_visuals_active = quadtree_visuals_active.clone();
+                move || {
+                    *quadtree_visuals_active.borrow_mut() = false;
+                }
+            }),
+        );
+
+        devtools
     }
 
     pub fn draw(&self) {
@@ -57,7 +96,8 @@ impl DevTools {
         }
 
         if self.devtools_active {
-            self.command_line.handle_inputs(self.noms.clone());
+            self.command_line
+                .handle_inputs(self.noms.clone(), self.quadtree.clone());
             self.toggles.update();
         }
     }

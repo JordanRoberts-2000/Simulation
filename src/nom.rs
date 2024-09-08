@@ -55,9 +55,9 @@ pub struct Nom {
 }
 
 impl Nom {
-    pub fn new(position: Vec2, player_controlled: bool) -> Self {
+    pub fn new(position: Vec2) -> Self {
         Self {
-            size: 24.,
+            size: 16.,
             position,
             target_position: Vec2::ZERO,
             current_speed: 0.0, // Scalar speed
@@ -68,7 +68,7 @@ impl Nom {
             turning_speed: 180.0, // Degrees per second
             panicking: false,
             temp_is_colliding: false,
-            player_controlled,
+            player_controlled: false,
         }
     }
 
@@ -91,6 +91,9 @@ impl Nom {
     }
 
     pub fn spawn_random() -> Self {
+        // get random position,
+        // check quadtree for collisions
+        // add to quadtree
         let mut rng = thread_rng();
         let size: f32 = 16.;
         Self {
@@ -112,7 +115,7 @@ impl Nom {
         }
     }
 
-    pub fn draw(&self) {
+    pub fn draw(&self, testing_visuals: Rc<RefCell<bool>>) {
         // Draw the circle representing the object
         draw_circle(
             self.position.x,
@@ -129,7 +132,9 @@ impl Nom {
         let line_length = 30.0;
         let x2 = self.position.x + self.orientation.to_radians().cos() * line_length;
         let y2 = self.position.y + self.orientation.to_radians().sin() * line_length;
-        draw_line(self.position.x, self.position.y, x2, y2, 2.0, RED);
+        if *testing_visuals.borrow() {
+            draw_line(self.position.x, self.position.y, x2, y2, 2.0, RED);
+        }
     }
 
     pub fn update_position(&mut self, delta_time: &f32) {

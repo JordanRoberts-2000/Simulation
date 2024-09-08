@@ -1,10 +1,14 @@
+use commands::*;
 use macroquad::prelude::*;
 use std::cell::RefCell;
 use std::collections::VecDeque;
 use std::rc::Rc;
 
 use crate::nom::Nom;
+use crate::quadtree::Quadtree;
 use crate::utils::draw::draw_rounded_rectangle;
+
+mod commands;
 
 pub struct CommandLine {
     input_field: String,
@@ -23,6 +27,24 @@ impl CommandLine {
         };
     }
 
+    fn submit_commands(
+        &mut self,
+        noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
+        quadtree: Rc<RefCell<Quadtree>>,
+    ) {
+        self.invalid_command = false;
+        match self.input_field.trim() {
+            "clear" => handle_clear(noms),
+            input if input.starts_with("spawn nom") => {
+                handle_spawn_nom(noms, input, &mut self.invalid_command, quadtree);
+            }
+            _ => self.invalid_command = true,
+        }
+        self.store_command(self.input_field.clone());
+        self.input_field.clear();
+        self.prev_command_index = 0;
+    }
+
     pub fn draw(&self) {
         // draw_rectangle(10.0, screen_height() - 40.0, 300.0, 30.0, GRAY);
         draw_rounded_rectangle(10.0, screen_height() - 40.0, 300.0, 30.0, 5.0, DARKGRAY);
@@ -39,9 +61,13 @@ impl CommandLine {
         draw_text("Command:", 20.0, screen_height() - 20.0, 24.0, WHITE);
     }
 
-    pub fn handle_inputs(&mut self, noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>) {
+    pub fn handle_inputs(
+        &mut self,
+        noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
+        quadtree: Rc<RefCell<Quadtree>>,
+    ) {
         if is_key_pressed(KeyCode::Enter) {
-            self.submit_command(noms);
+            self.submit_commands(noms, quadtree);
         }
         if is_key_pressed(KeyCode::Backspace) {
             self.input_field.pop();
@@ -102,22 +128,6 @@ impl CommandLine {
             // Add the new command to the front
             self.prev_commands.push_front(trimmed_command);
         }
-    }
-
-    fn submit_command(&mut self, noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>) {
-        self.invalid_command = false;
-        match self.input_field.trim() {
-            "clear" => noms.borrow_mut().clear(),
-            "spawn nom" => {
-                noms.borrow_mut()
-                    .push(Rc::new(RefCell::new(Nom::spawn_random())));
-            }
-            // ToDo: unknown command visuals
-            _ => self.invalid_command = true,
-        }
-        self.store_command(self.input_field.clone());
-        self.input_field.clear();
-        self.prev_command_index = 0;
     }
 
     pub fn clear_input(&mut self) {
