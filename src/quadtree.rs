@@ -137,11 +137,21 @@ impl Quadtree {
     pub fn retrieve(&self, return_objects: &mut Vec<Rc<RefCell<Nom>>>, nom: &Nom) {
         if let Some(ref nodes) = self.nodes {
             let index = self.get_index(nom);
+
             if let Some(i) = index {
                 nodes[i].retrieve(return_objects, nom);
+
+                // Check neighboring quadrants if the object is near the boundary
+                for (j, node) in nodes.iter().enumerate() {
+                    if j != i {
+                        // Add logic to check distance and retrieve objects from neighboring quadrants if necessary
+                        node.retrieve(return_objects, nom);
+                    }
+                }
             }
         }
 
-        return_objects.extend(self.objects.iter().cloned())
+        // Add objects from the current node
+        return_objects.extend(self.objects.iter().cloned());
     }
 }

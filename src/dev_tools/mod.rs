@@ -5,6 +5,7 @@ use std::rc::Rc;
 
 use crate::nom::Nom;
 use crate::quadtree::Quadtree;
+use crate::utils::draw::draw_rounded_rectangle;
 use toggles::Toggles;
 
 mod command_line;
@@ -74,9 +75,46 @@ impl DevTools {
         };
         // draw all the toggles
         draw_rectangle(0., 0., 400., screen_height(), Color::new(0., 0., 0., 0.7));
+        draw_rounded_rectangle(20.0, 120.0, 100.0, 100.0, 10.0, DARKGRAY);
+        draw_rounded_rectangle(20.0, 240.0, 100.0, 100.0, 10.0, DARKGRAY);
+        draw_rounded_rectangle(20.0, 360.0, 100.0, 100.0, 10.0, DARKGRAY);
+        draw_rounded_rectangle(140.0, 120.0, 100.0, 100.0, 10.0, DARKGRAY);
+        draw_rounded_rectangle(140.0, 240.0, 100.0, 100.0, 10.0, DARKGRAY);
+        draw_rounded_rectangle(140.0, 360.0, 100.0, 100.0, 10.0, DARKGRAY);
+        draw_rounded_rectangle(260.0, 120.0, 100.0, 100.0, 10.0, DARKGRAY);
+        draw_rounded_rectangle(260.0, 240.0, 100.0, 100.0, 10.0, DARKGRAY);
+        draw_rounded_rectangle(260.0, 360.0, 100.0, 100.0, 10.0, DARKGRAY);
+        draw_rounded_rectangle(
+            260.0 + 1.0,
+            360.0 + 1.0,
+            100.0 - 2.0,
+            100.0 - 2.0,
+            10.0,
+            BLACK,
+        );
+        draw_rounded_rectangle(20.0, 570.0, 160.0, 30.0, 5.0, DARKGRAY);
+        draw_rounded_rectangle(200.0, 570.0, 30.0, 30.0, 5.0, DARKGRAY);
+        draw_rounded_rectangle(250.0, 570.0, 30.0, 30.0, 5.0, DARKGRAY);
+        draw_rounded_rectangle(300.0, 570.0, 30.0, 30.0, 5.0, DARKGRAY);
+        draw_rounded_rectangle(350.0, 570.0, 30.0, 30.0, 5.0, DARKGRAY);
         draw_line(400., 0., 400., screen_height(), 1.0, GRAY);
-        draw_text("Quadgrid visuals", 20.0, 30.0, 24.0, WHITE);
-        draw_text("Nom visuals", 20.0, 70.0, 24.0, WHITE);
+        draw_text("Quadgrid visuals", 20.0, 40.0, 24.0, WHITE);
+        draw_text("Nom visuals", 20.0, 80.0, 24.0, WHITE);
+        draw_text("Twins", 20.0, 510.0, 20.0, WHITE);
+        draw_text("Spikes", 20.0, 550.0, 20.0, WHITE);
+        draw_text(
+            "Stage, egg, baby, adult, old, dead",
+            20.0,
+            530.0,
+            20.0,
+            WHITE,
+        );
+        draw_text("Random", 260.0, 550.0, 16.0, WHITE);
+        draw_rounded_rectangle(100.0, 540.0, 140.0, 4.0, 2.0, WHITE);
+        draw_rounded_rectangle(20.0, 620.0, 80.0, 30.0, 5.0, DARKGRAY);
+        draw_rounded_rectangle(20.0 + 1.0, 620.0 + 1.0, 80.0 - 2.0, 30.0 - 2.0, 5.0, BLACK);
+        draw_text("Clear all", 28.0, 639.0, 16.0, WHITE);
+        draw_text("Spawn plants", 120.0, 639.0, 16.0, WHITE);
         self.toggles.draw();
         self.command_line.draw();
     }

@@ -20,12 +20,19 @@ pub fn handle_spawn_nom(
         let mut nearby_noms: Vec<Rc<RefCell<Nom>>> = Vec::new();
         let new_nom = Nom::spawn_random();
         quadtree.borrow().retrieve(&mut nearby_noms, &new_nom);
+        let mut no_collisions = true;
         for nom in nearby_noms {
-            // println!("{},{}", nom.borrow().position.x, nom.borrow().position.y);
+            if new_nom.check_collision(&nom.borrow()) {
+                no_collisions = false;
+            }
         }
-        let hoof = Rc::new(RefCell::new(new_nom));
-        noms.borrow_mut().push(hoof.clone());
-        quadtree.borrow_mut().insert(hoof.clone());
+        if no_collisions {
+            let hoof = Rc::new(RefCell::new(new_nom));
+            noms.borrow_mut().push(hoof.clone());
+            quadtree.borrow_mut().insert(hoof.clone());
+        } else {
+            println!("Could not spawn as collision would happen");
+        }
     } else if parts.len() == 3 {
         if let Ok(number) = parts[2].parse::<usize>() {
             if number >= 1 {
@@ -33,12 +40,19 @@ pub fn handle_spawn_nom(
                     let mut nearby_noms: Vec<Rc<RefCell<Nom>>> = Vec::new();
                     let new_nom = Nom::spawn_random();
                     quadtree.borrow().retrieve(&mut nearby_noms, &new_nom);
+                    let mut no_collisions = true;
                     for nom in nearby_noms {
-                        // println!("{},{}", nom.borrow().position.x, nom.borrow().position.y);
+                        if new_nom.check_collision(&nom.borrow()) {
+                            no_collisions = false;
+                        }
                     }
-                    let hoof = Rc::new(RefCell::new(new_nom));
-                    noms.borrow_mut().push(hoof.clone());
-                    quadtree.borrow_mut().insert(hoof.clone());
+                    if no_collisions {
+                        let hoof = Rc::new(RefCell::new(new_nom));
+                        noms.borrow_mut().push(hoof.clone());
+                        quadtree.borrow_mut().insert(hoof.clone());
+                    } else {
+                        println!("Could not spawn as collision would happen");
+                    }
                 }
             } else {
                 *invalid_command = true;
