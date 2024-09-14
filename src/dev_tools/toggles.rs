@@ -12,7 +12,7 @@ impl Toggles {
         }
     }
 
-    pub fn update(&mut self) {
+    pub fn handle_inputs(&mut self) {
         for toggle in &mut self.toggles {
             toggle.check_click()
         }

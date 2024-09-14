@@ -62,7 +62,7 @@ impl CommandLine {
         draw_text(
             &self.input_field,
             110.0,
-            screen_height() - 20.0,
+            screen_height() - 24.0,
             24.0,
             WHITE,
         );

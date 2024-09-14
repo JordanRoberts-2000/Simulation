@@ -6,17 +6,21 @@ use std::rc::Rc;
 use crate::nom::Nom;
 use crate::quadtree::Quadtree;
 use crate::utils::draw::draw_rounded_rectangle;
+use nom_spawner::NomSpawner;
 use toggles::Toggles;
 
 mod command_line;
+mod nom_spawner;
 mod toggles;
 
 pub struct DevTools {
     devtools_active: bool,
     command_line: CommandLine,
+    nom_spawner: NomSpawner,
     pub nom_visuals_active: Rc<RefCell<bool>>,
     pub quadtree_visuals_active: Rc<RefCell<bool>>,
     toggles: Toggles,
+    nom_variant_selected_index: (usize, usize),
     noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
     quadtree: Rc<RefCell<Quadtree>>,
 }
@@ -28,15 +32,17 @@ impl DevTools {
         let mut devtools = DevTools {
             devtools_active: false,
             command_line: CommandLine::new(),
+            nom_spawner: NomSpawner::new(),
             nom_visuals_active: nom_visuals_active.clone(),
             quadtree_visuals_active: quadtree_visuals_active.clone(),
             toggles: Toggles::new(),
+            nom_variant_selected_index: (0, 0),
             noms,
             quadtree: quadtree.clone(),
         };
 
         devtools.toggles.add_toggle(
-            vec2(350., 75.),
+            vec2(350., 115.),
             Box::new({
                 let nom_visuals_active = nom_visuals_active.clone();
                 move || {
@@ -73,37 +79,24 @@ impl DevTools {
         if !self.devtools_active {
             return;
         };
-        // draw all the toggles
+        // Devtools side bar:
         draw_rectangle(0., 0., 400., screen_height(), Color::new(0., 0., 0., 0.7));
-        draw_rounded_rectangle(20.0, 120.0, 100.0, 100.0, 10.0, DARKGRAY);
-        draw_rounded_rectangle(20.0, 240.0, 100.0, 100.0, 10.0, DARKGRAY);
-        draw_rounded_rectangle(20.0, 360.0, 100.0, 100.0, 10.0, DARKGRAY);
-        draw_rounded_rectangle(140.0, 120.0, 100.0, 100.0, 10.0, DARKGRAY);
-        draw_rounded_rectangle(140.0, 240.0, 100.0, 100.0, 10.0, DARKGRAY);
-        draw_rounded_rectangle(140.0, 360.0, 100.0, 100.0, 10.0, DARKGRAY);
-        draw_rounded_rectangle(260.0, 120.0, 100.0, 100.0, 10.0, DARKGRAY);
-        draw_rounded_rectangle(260.0, 240.0, 100.0, 100.0, 10.0, DARKGRAY);
-        draw_rounded_rectangle(260.0, 360.0, 100.0, 100.0, 10.0, DARKGRAY);
-        draw_rounded_rectangle(
-            260.0 + 1.0,
-            360.0 + 1.0,
-            100.0 - 2.0,
-            100.0 - 2.0,
-            10.0,
-            BLACK,
-        );
+        // Toggles:
+        draw_text("Quadgrid visuals", 20.0, 40.0, 24.0, WHITE);
+        draw_text("Spatial grid visuals", 20.0, 80.0, 24.0, WHITE);
+        draw_text("Nom visuals", 20.0, 120.0, 24.0, WHITE);
+        // Nom spawner:
+        self.nom_spawner.draw();
         draw_rounded_rectangle(20.0, 570.0, 160.0, 30.0, 5.0, DARKGRAY);
         draw_rounded_rectangle(200.0, 570.0, 30.0, 30.0, 5.0, DARKGRAY);
         draw_rounded_rectangle(250.0, 570.0, 30.0, 30.0, 5.0, DARKGRAY);
         draw_rounded_rectangle(300.0, 570.0, 30.0, 30.0, 5.0, DARKGRAY);
         draw_rounded_rectangle(350.0, 570.0, 30.0, 30.0, 5.0, DARKGRAY);
         draw_line(400., 0., 400., screen_height(), 1.0, GRAY);
-        draw_text("Quadgrid visuals", 20.0, 40.0, 24.0, WHITE);
-        draw_text("Nom visuals", 20.0, 80.0, 24.0, WHITE);
         draw_text("Twins", 20.0, 510.0, 20.0, WHITE);
         draw_text("Spikes", 20.0, 550.0, 20.0, WHITE);
         draw_text(
-            "Stage, egg, baby, adult, old, dead",
+            "Stage, egg, baby, adult, old, dead, zombie",
             20.0,
             530.0,
             20.0,
@@ -132,11 +125,11 @@ impl DevTools {
                 while let Some(_) = get_char_pressed() {}
             }
         }
-
         if self.devtools_active {
             self.command_line
                 .handle_inputs(self.noms.clone(), self.quadtree.clone());
-            self.toggles.update();
+            self.toggles.handle_inputs();
+            self.nom_spawner.handle_inputs();
         }
     }
 }

@@ -6,7 +6,7 @@ use miniquad::window::quit;
 
 use crate::dev_tools::DevTools;
 use crate::entity_stats::EntityStats;
-use crate::nom::{Nom, Variant};
+use crate::nom::{Nom, NomVariant};
 use crate::plants::{PlantSpawn, Plants};
 use crate::quadtree::Quadtree;
 
@@ -29,29 +29,10 @@ pub struct Simulation {
 
 impl Simulation {
     pub fn new() -> Simulation {
-        let noms = Rc::new(RefCell::new(vec![
-            Rc::new(RefCell::new(Nom::new(vec2(300., 100.), Variant::Default))),
-            Rc::new(RefCell::new(Nom::new(
-                vec2(300., 300.),
-                Variant::DefaultTwin,
-            ))),
-            Rc::new(RefCell::new(Nom::new(
-                vec2(500., 100.),
-                Variant::WhaleMutation,
-            ))),
-            Rc::new(RefCell::new(Nom::new(vec2(500., 300.), Variant::Whale))),
-            Rc::new(RefCell::new(Nom::new(vec2(700., 100.), Variant::Hedgehog))),
-            Rc::new(RefCell::new(Nom::new(
-                vec2(700., 300.),
-                Variant::HedgehogMutation,
-            ))),
-            Rc::new(RefCell::new(Nom::new(vec2(900., 100.), Variant::Wendigo))),
-            Rc::new(RefCell::new(Nom::new(vec2(900., 300.), Variant::Wendigo2))),
-            Rc::new(RefCell::new(Nom::new(vec2(1100., 100.), Variant::Death))),
-            Rc::new(RefCell::new(Nom::new(vec2(1100., 300.), Variant::Zombie))),
-            Rc::new(RefCell::new(Nom::new(vec2(700., 700.), Variant::Leviathan))),
-            // ... other noms
-        ]));
+        let noms = Rc::new(RefCell::new(vec![Rc::new(RefCell::new(Nom::new(
+            vec2(300., 100.),
+            NomVariant::Default,
+        )))]));
         let quadtree = Rc::new(RefCell::new(Quadtree::new()));
         let sim = Simulation {
             noms: noms.clone(), // Use the same noms in Simulation
