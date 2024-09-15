@@ -90,7 +90,7 @@ impl Simulation {
             nom.borrow().draw(self.dev_tools.nom_visuals_active.clone());
         }
         self.dev_tools.draw();
-        // self.entity_stats.draw(&self.noms);
+        self.entity_stats.draw(self.noms.clone());
 
         if self.environment_stats || self.dev_tools.is_active() {
             self.draw_stats();

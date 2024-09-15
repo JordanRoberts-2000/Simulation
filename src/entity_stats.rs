@@ -1,6 +1,8 @@
 use macroquad::prelude::*;
+use std::cell::RefCell;
+use std::rc::Rc;
 
-use crate::nom::{self, Nom};
+use crate::nom::Nom;
 
 pub struct EntityStats {
     pub active: bool,
@@ -8,11 +10,16 @@ pub struct EntityStats {
 
 impl EntityStats {
     pub fn new() -> EntityStats {
-        return EntityStats { active: true };
+        return EntityStats { active: false };
     }
 
-    pub fn draw(&self, noms: &[Nom]) {
-        let nom_stats = noms[0].get_stats();
+    pub fn draw(&self, noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>) {
+        if !self.active {
+            return;
+        }
+        let noms_borrowed = noms.borrow();
+        let nom = noms_borrowed[0].borrow();
+        let nom_stats = nom.get_stats();
         let current_speed = format!("Current Speed: {}", nom_stats.current_speed);
         let max_speed = format!("Max Speed: {}", nom_stats.max_speed);
         let acceleration = format!("Acceleration: {}", nom_stats.acceleration);
