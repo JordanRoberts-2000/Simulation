@@ -50,21 +50,25 @@ pub struct Nom {
     mutation_variant: u32,
     perlin: Perlin,
     time_offset: f64,
+    look_ahead_distance: f32,
+    look_ahead_size: f32,
+    look_ahead_target: Vec2,
 }
 
 impl Nom {
     pub fn new(position: Vec2, variant: NomVariant) -> Self {
-        let starting_orientation = rand::gen_range(0.0, 359.0);
+        let starting_orientation: f32 = thread_rng().gen_range(0.0..=359.0);
+        let size = Nom::get_max_size(variant.clone());
         Self {
-            size: Nom::get_max_size(variant.clone()),
+            size,
             max_size: Nom::get_max_size(variant.clone()),
             age: get_time(),
             variant,
             position,
             target_position: Vec2::ZERO,
-            current_speed: 0.0,                // Scalar speed
-            orientation: starting_orientation, // Initial orientation
-            target_orientation: starting_orientation,
+            current_speed: 0.0,                             // Scalar speed
+            orientation: starting_orientation.to_radians(), // Initial orientation
+            target_orientation: starting_orientation.to_radians(),
             max_speed: NOM_SPAWN_SPEED,
             acceleration: NOM_SPAWN_SPEED / 2.0,
             turning_speed: 180.0, // Degrees per second
@@ -73,6 +77,9 @@ impl Nom {
             mutation_variant: thread_rng().gen_range(0..=2),
             perlin: Perlin::new(1),
             time_offset: rand::gen_range(0.0, 1000.0),
+            look_ahead_distance: size * 2.0,
+            look_ahead_size: size * 2.0,
+            look_ahead_target: vec2(0.0, 0.0),
         }
     }
 
@@ -80,7 +87,7 @@ impl Nom {
         // get random position,
         // check quadtree for collisions
         // add to quadtree
-        let starting_orientation = rand::gen_range(0.0, 359.0);
+        let starting_orientation: f32 = thread_rng().gen_range(0.0..=359.0);
         let mut rng = thread_rng();
         let size: f32 = 24.;
         Self {
@@ -93,9 +100,9 @@ impl Nom {
             ),
             variant: NomVariant::Default,
             target_position: Vec2::ZERO,
-            current_speed: 0.0,                // Scalar speed
-            orientation: starting_orientation, // Initial orientation
-            target_orientation: starting_orientation,
+            current_speed: 0.0,                             // Scalar speed
+            orientation: starting_orientation.to_radians(), // Initial orientation
+            target_orientation: starting_orientation.to_radians(),
             max_speed: NOM_SPAWN_SPEED,
             acceleration: NOM_SPAWN_SPEED / 2.0,
             turning_speed: 180.0, // Degrees per second
@@ -104,6 +111,9 @@ impl Nom {
             mutation_variant: thread_rng().gen_range(0..=2),
             perlin: Perlin::new(1),
             time_offset: rand::gen_range(0.0, 1000.0),
+            look_ahead_distance: size * 1.25,
+            look_ahead_size: size,
+            look_ahead_target: vec2(0.0, 0.0),
         }
     }
 
@@ -133,6 +143,9 @@ impl Nom {
             mutation_variant: thread_rng().gen_range(0..=2),
             perlin: Perlin::new(1),
             time_offset: rand::gen_range(0.0, 1000.0),
+            look_ahead_distance: size * 1.25,
+            look_ahead_size: size,
+            look_ahead_target: vec2(0.0, 0.0),
         }
     }
 

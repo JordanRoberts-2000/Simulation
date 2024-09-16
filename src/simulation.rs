@@ -30,7 +30,7 @@ pub struct Simulation {
 impl Simulation {
     pub fn new() -> Simulation {
         let noms = Rc::new(RefCell::new(vec![Rc::new(RefCell::new(Nom::new(
-            vec2(300., 100.),
+            vec2(screen_width() / 2.0, screen_height() / 2.0),
             NomVariant::Default,
         )))]));
         let quadtree = Rc::new(RefCell::new(Quadtree::new()));
@@ -59,6 +59,7 @@ impl Simulation {
             }
         }
         self.key_pressed();
+        self.entity_stats.update(self.noms.clone());
     }
 
     pub fn key_pressed(&mut self) {
@@ -90,7 +91,7 @@ impl Simulation {
             nom.borrow().draw(self.dev_tools.nom_visuals_active.clone());
         }
         self.dev_tools.draw();
-        self.entity_stats.draw(self.noms.clone());
+        self.entity_stats.draw();
 
         if self.environment_stats || self.dev_tools.is_active() {
             self.draw_stats();

@@ -8,15 +8,12 @@ impl Nom {
     pub fn draw(&self, testing_visuals: Rc<RefCell<bool>>) {
         self.draw_body();
         self.draw_mutation();
-
-        // Draw the direction the object is facing (orientation line)
+        // self.draw_testing_visuals();
         if *testing_visuals.borrow() {
-            let line_length = 30.0;
-            let x2 = self.position.x + self.orientation.to_radians().cos() * line_length;
-            let y2 = self.position.y + self.orientation.to_radians().sin() * line_length;
-            draw_line(self.position.x, self.position.y, x2, y2, 2.0, RED);
+            self.draw_testing_visuals();
         }
     }
+
     fn draw_body(&self) {
         let (color, border_color) = match self.variant {
             NomVariant::Wendigo => (Color::from_hex(0x450a0a), Color::from_hex(0xdc2626)),
@@ -126,6 +123,48 @@ impl Nom {
                     .round(),
             if large && self.size >= 18.0 { 2.0 } else { 1.0 },
             mutation_color,
+        );
+    }
+
+    pub fn draw_testing_visuals(&self) {
+        // Detection radius
+        draw_circle_lines(self.position.x, self.position.y, 200.0, 2.0, DARKGRAY);
+        // Orientation
+        {
+            let line_length = 30.0;
+            let x2 = self.position.x + self.orientation.cos() * line_length;
+            let y2 = self.position.y + self.orientation.sin() * line_length;
+            draw_line(self.position.x, self.position.y, x2, y2, 2.0, RED);
+        }
+        // Target orientation
+        {
+            let line_length = 30.0;
+            let x2 = self.position.x + self.target_orientation.cos() * line_length;
+            let y2 = self.position.y + self.target_orientation.sin() * line_length;
+            draw_line(self.position.x, self.position.y, x2, y2, 2.0, BLUE);
+        }
+        // Wander steering
+        let look_ahead_distance = self.look_ahead_distance;
+        let wander_radius = self.look_ahead_size / 2.0;
+        let look_ahead_position = Vec2::new(
+            self.position.x + self.orientation.cos() * look_ahead_distance,
+            self.position.y + self.orientation.sin() * look_ahead_distance,
+        );
+        draw_circle_lines(
+            look_ahead_position.x,
+            look_ahead_position.y,
+            wander_radius,
+            2.0,
+            GREEN,
+        );
+        draw_circle(self.look_ahead_target.x, self.look_ahead_target.y, 5.0, RED);
+        draw_line(
+            self.position.x,
+            self.position.y,
+            self.look_ahead_target.x,
+            self.look_ahead_target.y,
+            2.0,
+            RED,
         );
     }
 }
