@@ -46,27 +46,38 @@ impl CommandLine {
     }
 
     pub fn draw(&self) {
-        // draw_rectangle(10.0, screen_height() - 40.0, 300.0, 30.0, GRAY);
-        draw_rounded_rectangle(10.0, screen_height() - 50.0, 370.0, 40.0, 5.0, DARKGRAY);
+        let border_width: f32 = 2.0;
         draw_rounded_rectangle(
-            10.0 + 2.0,
-            screen_height() - 50.0 + 2.0,
-            370.0 - 4.0,
-            40.0 - 4.0,
+            10.0,
+            screen_height() - 40.0,
+            370.0,
+            30.0,
+            5.0,
+            if self.input_field.trim().is_empty() {
+                DARKGRAY
+            } else {
+                BLUE
+            },
+        );
+        draw_rounded_rectangle(
+            10.0 + border_width,
+            screen_height() - 40.0 + border_width,
+            370.0 - border_width * 2.0,
+            30.0 - border_width * 2.0,
             5.0,
             BLACK,
         );
         if self.invalid_command {
-            draw_rectangle_lines(10.0, screen_height() - 40.0, 300.0, 30.0, 6.0, RED);
+            draw_rectangle_lines(10.0, screen_height() - 20.0, 370.0, 30.0, 6.0, RED);
         }
         draw_text(
             &self.input_field,
-            110.0,
-            screen_height() - 24.0,
-            24.0,
+            100.0,
+            screen_height() - 20.0,
+            20.0,
             WHITE,
         );
-        draw_text("Command:", 20.0, screen_height() - 24.0, 24.0, WHITE);
+        draw_text("Command:", 20.0, screen_height() - 20.0, 22.0, WHITE);
     }
 
     pub fn handle_inputs(

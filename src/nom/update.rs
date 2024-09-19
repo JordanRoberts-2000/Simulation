@@ -7,7 +7,7 @@ impl Nom {
         let delta_time = get_frame_time();
         // println!("o: {}, t_o: {}", self.orientation, self.target_orientation);
         self.update_orientation(delta_time);
-        // self.update_position(&delta_time);
+        self.update_position(&delta_time);
     }
     fn update_position(&mut self, delta_time: &f32) {
         self.current_speed =
@@ -26,11 +26,12 @@ impl Nom {
 
         // Use the blended force to calculate the target orientation
         self.target_orientation = wandering_force;
-        // self.orientation = lerp_angle(
-        //     self.orientation,
-        //     self.target_orientation,
-        //     self.turning_speed,
-        //     delta_time,
-        // );
+        // self.orientation += self.turning_speed * delta_time;
+        self.orientation = lerp_angle(
+            self.orientation,
+            self.target_orientation,
+            self.turning_speed,
+            delta_time,
+        );
     }
 }

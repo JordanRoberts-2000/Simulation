@@ -71,7 +71,7 @@ impl Nom {
             target_orientation: starting_orientation.to_radians(),
             max_speed: NOM_SPAWN_SPEED,
             acceleration: NOM_SPAWN_SPEED / 2.0,
-            turning_speed: 180.0, // Degrees per second
+            turning_speed: (120.0 as f32).to_radians(),
             panicking: false,
             player_controlled: false,
             mutation_variant: thread_rng().gen_range(0..=2),
@@ -105,7 +105,7 @@ impl Nom {
             target_orientation: starting_orientation.to_radians(),
             max_speed: NOM_SPAWN_SPEED,
             acceleration: NOM_SPAWN_SPEED / 2.0,
-            turning_speed: 180.0, // Degrees per second
+            turning_speed: (120.0 as f32).to_radians(),
             panicking: false,
             player_controlled: false,
             mutation_variant: thread_rng().gen_range(0..=2),
@@ -137,7 +137,7 @@ impl Nom {
             target_orientation: 0.0,
             max_speed: NOM_SPAWN_SPEED,
             acceleration: NOM_SPAWN_SPEED / 2.0,
-            turning_speed: 180.0, // Degrees per second
+            turning_speed: (120.0 as f32).to_radians(),
             panicking: false,
             player_controlled: false,
             mutation_variant: thread_rng().gen_range(0..=2),
@@ -155,7 +155,7 @@ impl Nom {
             NomVariant::Wendigo => 32.0,
             NomVariant::Whale => 160.0,
             NomVariant::Leviathan => 400.0,
-            _ => 24.0,
+            _ => 12.0,
         }
     }
 
