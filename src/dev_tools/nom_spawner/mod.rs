@@ -1,7 +1,9 @@
 use std::{cell::RefCell, rc::Rc};
 
 use macroquad::prelude::*;
+use spawn_settings::{NomLifeCycle, NomTwins};
 
+use crate::utils::selection::{self, Selection};
 use crate::utils::slider::Slider;
 use crate::utils::toggle::ToggleSwitch;
 use crate::{
@@ -27,6 +29,10 @@ pub struct NomSpawner {
     spike_random_toggle: Option<ToggleSwitch>,
     spike_amount: u32,
     spike_amount_slider: Option<Slider>,
+    life_cycle: NomLifeCycle,
+    life_cycle_selection: Option<Selection<NomLifeCycle>>,
+    twins: NomTwins,
+    twins_selection: Option<Selection<NomTwins>>,
 }
 
 impl NomSpawner {
@@ -38,6 +44,10 @@ impl NomSpawner {
             spike_random_toggle: None,
             spike_amount: 0,
             spike_amount_slider: None,
+            life_cycle: NomLifeCycle::Adult,
+            life_cycle_selection: None,
+            twins: NomTwins::Off,
+            twins_selection: None,
         };
         nom_spawner.spawn_settings();
         nom_spawner
@@ -77,13 +87,14 @@ impl NomSpawner {
     }
 
     pub fn update(&mut self) {
-        if let Some(toggle) = &mut self.spike_random_toggle {
-            toggle.update();
-        }
-        if let Some(slider) = &mut self.spike_amount_slider {
-            slider.update();
-            self.spike_amount = slider.get_index()
-        }
+        // match self.life_cycle {
+        //     NomLifeCycle::Adult => println!("Adult"),
+        //     NomLifeCycle::Baby => println!("baby"),
+        //     NomLifeCycle::Old => println!("old"),
+        //     NomLifeCycle::Dead => println!("dead"),
+        //     NomLifeCycle::Zombie => println!("zombie"),
+        // }
+        self.update_spawn_settings();
         for i in 0..3 {
             for j in 0..3 {
                 let x = GRID_POSITION.x + ((GRID_ITEM_SIZE + GRID_GAP) * i as f32);

@@ -85,16 +85,6 @@ impl DevTools {
         self.nom_spawner.draw();
 
         draw_line(400., 0., 400., screen_height(), 1.0, GRAY);
-        draw_text("Twins:  on,  off,  random", 20.0, 530.0, 20.0, WHITE);
-        draw_text(
-            "Stage:  baby,  adult,  old,  dead,  zombie",
-            20.0,
-            565.0,
-            20.0,
-            WHITE,
-        );
-        draw_text("Spikes:", 20.0, 600.0, 20.0, WHITE);
-        // draw_rounded_rectangle(100.0, 592.0, 140.0, 4.0, 2.0, WHITE);
         for (_, button) in self.buttons.iter() {
             button.draw();
         }
