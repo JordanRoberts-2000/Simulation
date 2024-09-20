@@ -1,5 +1,6 @@
 use crate::simulation::Simulation;
 use macroquad::prelude::*;
+use macroquad::time::get_fps;
 
 mod dev_tools;
 mod entity_stats;

@@ -111,8 +111,8 @@ impl Nom {
             mutation_variant: thread_rng().gen_range(0..=2),
             perlin: Perlin::new(1),
             time_offset: rand::gen_range(0.0, 1000.0),
-            look_ahead_distance: size * 1.25,
-            look_ahead_size: size,
+            look_ahead_distance: size * 2.0,
+            look_ahead_size: size * 2.0,
             look_ahead_target: vec2(0.0, 0.0),
         }
     }
@@ -155,7 +155,7 @@ impl Nom {
             NomVariant::Wendigo => 32.0,
             NomVariant::Whale => 160.0,
             NomVariant::Leviathan => 400.0,
-            _ => 12.0,
+            _ => 24.0,
         }
     }
 

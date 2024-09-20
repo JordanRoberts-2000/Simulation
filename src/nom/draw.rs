@@ -91,19 +91,19 @@ impl Nom {
             _ => Color::new(0.9961, 0.0, 0.9961, 1.0),
         };
         if self.mutation_variant == 0 {
-            self.draw_mutation_bubble(vec2(5.0, -1.0), false, mutation_color);
-            self.draw_mutation_bubble(vec2(-2.0, -3.0), true, mutation_color);
-            self.draw_mutation_bubble(vec2(-3.0, 2.0), false, mutation_color);
-            self.draw_mutation_bubble(vec2(3.0, 4.0), false, mutation_color);
+            self.draw_mutation_bubble(self.rotate_point(vec2(5.0, -1.0)), false, mutation_color);
+            self.draw_mutation_bubble(self.rotate_point(vec2(-2.0, -3.0)), true, mutation_color);
+            self.draw_mutation_bubble(self.rotate_point(vec2(-3.0, 2.0)), false, mutation_color);
+            self.draw_mutation_bubble(self.rotate_point(vec2(3.0, 4.0)), false, mutation_color);
         }
         if self.mutation_variant == 1 {
-            self.draw_mutation_bubble(vec2(0.0, -3.0), true, mutation_color);
-            self.draw_mutation_bubble(vec2(-3.0, 2.0), false, mutation_color);
-            self.draw_mutation_bubble(vec2(3.0, 1.0), false, mutation_color);
+            self.draw_mutation_bubble(self.rotate_point(vec2(0.0, -3.0)), true, mutation_color);
+            self.draw_mutation_bubble(self.rotate_point(vec2(-3.0, 2.0)), false, mutation_color);
+            self.draw_mutation_bubble(self.rotate_point(vec2(3.0, 1.0)), false, mutation_color);
         }
         if self.mutation_variant == 2 {
-            self.draw_mutation_bubble(vec2(1.0, -2.0), true, mutation_color);
-            self.draw_mutation_bubble(vec2(-2.0, 3.0), false, mutation_color);
+            self.draw_mutation_bubble(self.rotate_point(vec2(1.0, -2.0)), true, mutation_color);
+            self.draw_mutation_bubble(self.rotate_point(vec2(-2.0, 3.0)), false, mutation_color);
         }
     }
 
@@ -112,18 +112,25 @@ impl Nom {
         let finish_size: f32 = 18.0;
         draw_circle(
             self.position[0]
-                + (((self.size.clamp(start_size, finish_size) - start_size)
+                + ((self.size.clamp(start_size, finish_size) - start_size)
                     / (finish_size - start_size))
-                    * position.x)
-                    .round(),
+                    * position.x,
             self.position[1]
-                + (((self.size.clamp(start_size, finish_size) - start_size)
+                + ((self.size.clamp(start_size, finish_size) - start_size)
                     / (finish_size - start_size))
-                    * position.y)
-                    .round(),
+                    * position.y,
             if large && self.size >= 18.0 { 2.0 } else { 1.0 },
             mutation_color,
         );
+    }
+
+    fn rotate_point(&self, point: Vec2) -> Vec2 {
+        let cos_theta = self.orientation.cos();
+        let sin_theta = self.orientation.sin();
+        Vec2::new(
+            point.x * cos_theta - point.y * sin_theta, // New x after rotation
+            point.x * sin_theta + point.y * cos_theta, // New y after rotation
+        )
     }
 
     pub fn draw_testing_visuals(&self) {
@@ -150,21 +157,21 @@ impl Nom {
             self.position.x + self.orientation.cos() * look_ahead_distance,
             self.position.y + self.orientation.sin() * look_ahead_distance,
         );
-        draw_circle_lines(
-            look_ahead_position.x,
-            look_ahead_position.y,
-            wander_radius,
-            2.0,
-            GREEN,
-        );
-        draw_circle(self.look_ahead_target.x, self.look_ahead_target.y, 5.0, RED);
-        draw_line(
-            self.position.x,
-            self.position.y,
-            self.look_ahead_target.x,
-            self.look_ahead_target.y,
-            2.0,
-            RED,
-        );
+        // draw_circle_lines(
+        //     look_ahead_position.x,
+        //     look_ahead_position.y,
+        //     wander_radius,
+        //     2.0,
+        //     GREEN,
+        // );
+        // draw_circle(self.look_ahead_target.x, self.look_ahead_target.y, 5.0, RED);
+        // draw_line(
+        //     self.position.x,
+        //     self.position.y,
+        //     self.look_ahead_target.x,
+        //     self.look_ahead_target.y,
+        //     2.0,
+        //     RED,
+        // );
     }
 }

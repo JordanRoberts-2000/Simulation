@@ -22,10 +22,10 @@ impl Nom {
         let avoidance_force = self.calculate_avoidance_behavior();
 
         // Blend the behaviors with weights
-        let final_force = (wandering_force * 0.4) + (avoidance_force * 0.6);
+        let final_force = wandering_force + avoidance_force;
 
         // Use the blended force to calculate the target orientation
-        self.target_orientation = wandering_force;
+        self.target_orientation = final_force;
         // self.orientation += self.turning_speed * delta_time;
         self.orientation = lerp_angle(
             self.orientation,
