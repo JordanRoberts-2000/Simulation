@@ -2,10 +2,16 @@ use std::{cell::RefCell, rc::Rc};
 
 use macroquad::prelude::*;
 
+use crate::utils::slider::Slider;
+use crate::utils::toggle::ToggleSwitch;
 use crate::{
     nom::{Nom, NomVariant},
     utils::draw::draw_rounded_rectangle,
 };
+
+mod nom_selector;
+mod spawn_buttons;
+mod spawn_settings;
 
 const GRID_GAP: f32 = 20.0;
 const GRID_ITEM_SIZE: f32 = 100.0;
@@ -15,19 +21,30 @@ const GRID_BORDER_COLOR_ACTIVE: Color = DARKBLUE;
 const GRID_POSITION: Vec2 = vec2(30.0, 150.0);
 
 pub struct NomSpawner {
-    selected_index: (usize, usize),
+    nom_selection_index: (usize, usize),
     display_noms: Vec<Nom>,
+    spike_random: Rc<RefCell<bool>>,
+    spike_random_toggle: Option<ToggleSwitch>,
+    spike_amount: u32,
+    spike_amount_slider: Option<Slider>,
 }
 
 impl NomSpawner {
     pub fn new() -> Self {
-        Self {
-            selected_index: (0, 0),
+        let mut nom_spawner = Self {
+            nom_selection_index: (0, 0),
             display_noms: NomSpawner::display_noms(),
-        }
+            spike_random: Rc::new(RefCell::new(false)),
+            spike_random_toggle: None,
+            spike_amount: 0,
+            spike_amount_slider: None,
+        };
+        nom_spawner.spawn_settings();
+        nom_spawner
     }
 
     pub fn draw(&self) {
+        self.draw_spawn_settings();
         for i in 0..3 {
             for j in 0..3 {
                 draw_rounded_rectangle(
@@ -36,7 +53,7 @@ impl NomSpawner {
                     GRID_ITEM_SIZE,
                     GRID_ITEM_SIZE,
                     10.0,
-                    if self.selected_index == (i, j) {
+                    if self.nom_selection_index == (i, j) {
                         GRID_BORDER_COLOR_ACTIVE
                     } else {
                         GRID_BORDER_COLOR
@@ -59,7 +76,14 @@ impl NomSpawner {
         }
     }
 
-    pub fn handle_inputs(&mut self) {
+    pub fn update(&mut self) {
+        if let Some(toggle) = &mut self.spike_random_toggle {
+            toggle.update();
+        }
+        if let Some(slider) = &mut self.spike_amount_slider {
+            slider.update();
+            self.spike_amount = slider.get_index()
+        }
         for i in 0..3 {
             for j in 0..3 {
                 let x = GRID_POSITION.x + ((GRID_ITEM_SIZE + GRID_GAP) * i as f32);
@@ -68,7 +92,7 @@ impl NomSpawner {
                 if is_mouse_button_pressed(MouseButton::Left)
                     && rect.contains(mouse_position().into())
                 {
-                    self.selected_index = (i, j);
+                    self.nom_selection_index = (i, j);
                 }
             }
         }

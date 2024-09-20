@@ -10,7 +10,6 @@ pub enum ToggleKeys {
     QuadTree,
     GRID,
     NomVisuals,
-    Spikes,
 }
 
 impl DevTools {
@@ -61,17 +60,6 @@ impl DevTools {
                 }),
                 Box::new(|| {
                     println!("Grid toggle off");
-                }),
-            ),
-        );
-        toggles.insert(
-            ToggleKeys::Spikes,
-            ToggleSwitch::new(
-                Box::new(|| {
-                    println!("Spikes toggle on");
-                }),
-                Box::new(|| {
-                    println!("Spikes toggle off");
                 }),
             ),
         );

@@ -47,7 +47,18 @@ impl CommandLine {
 
     pub fn draw(&self) {
         let border_width: f32 = 2.0;
-        draw_rounded_rectangle(10.0, screen_height() - 40.0, 370.0, 30.0, 5.0, BLUE);
+        draw_rounded_rectangle(
+            10.0,
+            screen_height() - 40.0,
+            370.0,
+            30.0,
+            5.0,
+            if self.input_field.trim().is_empty() {
+                GRAY
+            } else {
+                BLUE
+            },
+        );
         draw_rounded_rectangle(
             10.0 + border_width,
             screen_height() - 40.0 + border_width,

@@ -8,6 +8,7 @@ use crate::nom::Nom;
 use crate::quadtree::Quadtree;
 use crate::utils::button::Button;
 use crate::utils::draw::draw_rounded_rectangle;
+use crate::utils::slider::Slider;
 use crate::utils::toggle::ToggleSwitch;
 use buttons::ButtonKeys;
 use nom_spawner::NomSpawner;
@@ -66,7 +67,6 @@ impl DevTools {
         devtools.set_toggle(ToggleKeys::QuadTree, 350.0, 35.0);
         devtools.set_toggle(ToggleKeys::NomVisuals, 350.0, 115.0);
         devtools.set_toggle(ToggleKeys::GRID, 350.0, 75.0);
-        devtools.set_toggle(ToggleKeys::Spikes, 350.0, 594.0);
 
         devtools
     }
@@ -94,8 +94,7 @@ impl DevTools {
             WHITE,
         );
         draw_text("Spikes:", 20.0, 600.0, 20.0, WHITE);
-        draw_text("Random", 260.0, 598.0, 18.0, WHITE);
-        draw_rounded_rectangle(100.0, 592.0, 140.0, 4.0, 2.0, WHITE);
+        // draw_rounded_rectangle(100.0, 592.0, 140.0, 4.0, 2.0, WHITE);
         for (_, button) in self.buttons.iter() {
             button.draw();
         }
@@ -121,7 +120,7 @@ impl DevTools {
         if self.devtools_active {
             self.command_line
                 .handle_inputs(self.noms.clone(), self.quadtree.clone());
-            self.nom_spawner.handle_inputs();
+            self.nom_spawner.update();
             for (_, button) in self.buttons.iter_mut() {
                 button.update();
             }
