@@ -25,13 +25,13 @@ impl<T: PartialEq + Clone> Selection<T> {
             let mouse_y = mouse_pos.1;
 
             for (label, value) in &self.options {
-                let text_width = measure_text(label, None, 18, 1.0).width;
+                let text_width = measure_text(label, None, 20, 1.0).width;
                 let padding = 2.0;
 
                 if is_mouse_button_pressed(MouseButton::Left)
                     && mouse_x >= pos.x
                     && mouse_x <= pos.x + text_width
-                    && mouse_y >= pos.y - (18.0 + padding)
+                    && mouse_y >= pos.y - (20.0 + padding)
                     && mouse_y <= pos.y + padding
                 {
                     self.selected = value.clone();
@@ -45,8 +45,8 @@ impl<T: PartialEq + Clone> Selection<T> {
         if let Some(mut pos) = self.position {
             for (label, value) in &self.options {
                 let color = if *value == self.selected { BLUE } else { WHITE };
-                draw_text(label, pos.x, pos.y, 18.0, color);
-                let text_width = measure_text(label, None, 18, 1.0).width;
+                draw_text(label, pos.x, pos.y, 20.0, color);
+                let text_width = measure_text(label, None, 20, 1.0).width;
                 pos.x += text_width + 20.0;
             }
         }

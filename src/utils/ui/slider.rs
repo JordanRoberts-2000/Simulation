@@ -1,6 +1,6 @@
 use macroquad::prelude::*;
 
-use super::draw::draw_rounded_rectangle;
+use crate::utils::draw::draw_rounded_rectangle;
 
 pub struct Slider {
     width: Option<f32>,

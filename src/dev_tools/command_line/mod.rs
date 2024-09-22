@@ -8,7 +8,7 @@ use crate::nom::Nom;
 use crate::quadtree::Quadtree;
 use crate::utils::draw::draw_rounded_rectangle;
 
-mod commands;
+pub mod commands;
 
 pub struct CommandLine {
     input_field: String,
@@ -49,9 +49,9 @@ impl CommandLine {
         let border_width: f32 = 2.0;
         draw_rounded_rectangle(
             10.0,
-            screen_height() - 40.0,
+            screen_height() - 50.0,
             370.0,
-            30.0,
+            40.0,
             5.0,
             if self.input_field.trim().is_empty() {
                 GRAY
@@ -61,26 +61,26 @@ impl CommandLine {
         );
         draw_rounded_rectangle(
             10.0 + border_width,
-            screen_height() - 40.0 + border_width,
+            screen_height() - 50.0 + border_width,
             370.0 - border_width * 2.0,
-            30.0 - border_width * 2.0,
+            40.0 - border_width * 2.0,
             5.0,
             BLACK,
         );
         if self.invalid_command {
-            draw_rectangle_lines(10.0, screen_height() - 20.0, 370.0, 30.0, 6.0, RED);
+            draw_rectangle_lines(10.0, screen_height() - 50.0, 370.0, 40.0, 6.0, RED);
         }
         draw_text(
             &self.input_field,
-            100.0,
-            screen_height() - 20.0,
-            20.0,
+            110.0,
+            screen_height() - 24.0,
+            24.0,
             WHITE,
         );
-        draw_text("Command:", 20.0, screen_height() - 20.0, 22.0, WHITE);
+        draw_text("Command:", 20.0, screen_height() - 24.0, 24.0, WHITE);
     }
 
-    pub fn handle_inputs(
+    pub fn update(
         &mut self,
         noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
         quadtree: Rc<RefCell<Quadtree>>,

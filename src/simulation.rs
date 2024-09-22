@@ -37,7 +37,7 @@ impl Simulation {
         let sim = Simulation {
             noms: noms.clone(), // Use the same noms in Simulation
             plants: Plants::new(DEFAULT_PLANTS_SPAWN),
-            dev_tools: DevTools::new(noms.clone(), quadtree.clone()),
+            dev_tools: DevTools::new(),
             environment_stats: false,
             entity_stats: EntityStats::new(),
             quadtree: quadtree.clone(),
@@ -58,12 +58,9 @@ impl Simulation {
                 nom.borrow_mut().update();
             }
         }
-        self.key_pressed();
         self.entity_stats.update(self.noms.clone());
-    }
-
-    pub fn key_pressed(&mut self) {
-        self.dev_tools.handle_inputs();
+        self.dev_tools
+            .update(self.noms.clone(), self.quadtree.clone());
         if is_key_pressed(KeyCode::I) {
             self.environment_stats = !self.environment_stats;
         }
@@ -83,12 +80,12 @@ impl Simulation {
         );
         self.quadtree
             .borrow()
-            .draw(self.dev_tools.quadtree_visuals_active.clone());
+            .draw(self.dev_tools.quadtree_visuals_active());
         for plant in &self.plants.plant_vec {
             plant.draw();
         }
         for nom in self.noms.borrow().iter() {
-            nom.borrow().draw(self.dev_tools.nom_visuals_active.clone());
+            nom.borrow().draw(Rc::new(RefCell::new(false)));
         }
         self.dev_tools.draw();
         self.entity_stats.draw();
@@ -100,12 +97,5 @@ impl Simulation {
 
     pub fn draw_stats(&self) {
         draw_text("Number of noms:", screen_width() - 200.0, 30.0, 20.0, WHITE);
-        draw_text(
-            "Number of Plants:",
-            screen_width() - 200.0,
-            60.0,
-            20.0,
-            WHITE,
-        );
     }
 }

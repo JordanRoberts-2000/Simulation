@@ -68,8 +68,8 @@ impl Quadtree {
         }
     }
 
-    pub fn draw(&self, show_visuals: Rc<RefCell<bool>>) {
-        if *show_visuals.borrow() {
+    pub fn draw(&self, show_visuals: bool) {
+        if show_visuals {
             draw_rectangle_lines(
                 self.bounds.x,
                 self.bounds.y,

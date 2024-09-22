@@ -1,60 +1,23 @@
 use std::{cell::RefCell, rc::Rc};
 
-use macroquad::prelude::*;
-use spawn_settings::{NomLifeCycle, NomTwins};
+use ::macroquad::prelude::*;
 
-use crate::utils::selection::{self, Selection};
-use crate::utils::slider::Slider;
-use crate::utils::toggle::ToggleSwitch;
 use crate::{
     nom::{Nom, NomVariant},
     utils::draw::draw_rounded_rectangle,
 };
 
-mod nom_selector;
-mod spawn_buttons;
-mod spawn_settings;
+use super::NomSpawner;
 
 const GRID_GAP: f32 = 20.0;
-const GRID_ITEM_SIZE: f32 = 100.0;
-const GRID_ITEM_BORDER_WIDTH: f32 = 1.0;
+const GRID_ITEM_SIZE: f32 = 90.0;
+const GRID_ITEM_BORDER_WIDTH: f32 = 2.0;
 const GRID_BORDER_COLOR: Color = GRAY;
 const GRID_BORDER_COLOR_ACTIVE: Color = DARKBLUE;
-const GRID_POSITION: Vec2 = vec2(30.0, 150.0);
-
-pub struct NomSpawner {
-    nom_selection_index: (usize, usize),
-    display_noms: Vec<Nom>,
-    spike_random: Rc<RefCell<bool>>,
-    spike_random_toggle: Option<ToggleSwitch>,
-    spike_amount: u32,
-    spike_amount_slider: Option<Slider>,
-    life_cycle: NomLifeCycle,
-    life_cycle_selection: Option<Selection<NomLifeCycle>>,
-    twins: NomTwins,
-    twins_selection: Option<Selection<NomTwins>>,
-}
+const GRID_POSITION: Vec2 = vec2(40.0, 180.0);
 
 impl NomSpawner {
-    pub fn new() -> Self {
-        let mut nom_spawner = Self {
-            nom_selection_index: (0, 0),
-            display_noms: NomSpawner::display_noms(),
-            spike_random: Rc::new(RefCell::new(false)),
-            spike_random_toggle: None,
-            spike_amount: 0,
-            spike_amount_slider: None,
-            life_cycle: NomLifeCycle::Adult,
-            life_cycle_selection: None,
-            twins: NomTwins::Off,
-            twins_selection: None,
-        };
-        nom_spawner.spawn_settings();
-        nom_spawner
-    }
-
-    pub fn draw(&self) {
-        self.draw_spawn_settings();
+    pub fn draw_nom_selector(&self) {
         for i in 0..3 {
             for j in 0..3 {
                 draw_rounded_rectangle(
@@ -86,15 +49,7 @@ impl NomSpawner {
         }
     }
 
-    pub fn update(&mut self) {
-        // match self.life_cycle {
-        //     NomLifeCycle::Adult => println!("Adult"),
-        //     NomLifeCycle::Baby => println!("baby"),
-        //     NomLifeCycle::Old => println!("old"),
-        //     NomLifeCycle::Dead => println!("dead"),
-        //     NomLifeCycle::Zombie => println!("zombie"),
-        // }
-        self.update_spawn_settings();
+    pub fn update_nom_selector(&mut self) {
         for i in 0..3 {
             for j in 0..3 {
                 let x = GRID_POSITION.x + ((GRID_ITEM_SIZE + GRID_GAP) * i as f32);
@@ -140,8 +95,8 @@ impl NomSpawner {
                     (1, 1) => NomVariant::Hedgehog,
                     (1, 2) => NomVariant::Death,
                     (2, 0) => NomVariant::BlueMutation,
-                    (2, 1) => NomVariant::Whale,
-                    (2, 2) => NomVariant::Leviathan,
+                    (2, 1) => NomVariant::Shark,
+                    (2, 2) => NomVariant::Whale,
                     _ => panic!("Invalid index used in display_noms()"),
                 };
                 nom_array.push(Nom::display_new(vec2(x, y), variant));

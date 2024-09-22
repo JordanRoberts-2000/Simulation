@@ -26,6 +26,7 @@ impl Nom {
                 Color::new(0.2, 0.0, 0.2, 1.0),
                 Color::new(0.2, 0.0, 0.2, 1.0),
             ),
+            NomVariant::Shark => (Color::from_hex(0x1e3a8a), Color::from_hex(0x3b82f6)),
             _ => (
                 Color::new(0.2, 0.0, 0.2, 1.0),
                 Color::new(0.9961, 0.0, 0.9961, 1.0),
@@ -87,6 +88,7 @@ impl Nom {
             NomVariant::RedMutation => RED,
             NomVariant::Hedgehog => YELLOW,
             NomVariant::Wendigo => RED,
+            NomVariant::Shark => Color::from_hex(0xf87171),
             NomVariant::Death => Color::from_hex(0x991b1b),
             _ => Color::new(0.9961, 0.0, 0.9961, 1.0),
         };

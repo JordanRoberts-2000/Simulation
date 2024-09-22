@@ -25,6 +25,7 @@ pub enum NomVariant {
     GreenMutation,
     RedMutation,
     Hedgehog,
+    Shark,
     Whale,
     Death,
     Wendigo,
@@ -123,6 +124,7 @@ impl Nom {
             NomVariant::Whale => 50.0,
             NomVariant::Hedgehog => 18.0,
             NomVariant::Wendigo => 32.0,
+            NomVariant::Shark => 32.0,
             _ => 24.0,
         };
         Self {
@@ -155,6 +157,7 @@ impl Nom {
             NomVariant::Wendigo => 32.0,
             NomVariant::Whale => 160.0,
             NomVariant::Leviathan => 400.0,
+            NomVariant::Shark => 32.0,
             _ => 24.0,
         }
     }
