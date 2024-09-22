@@ -6,6 +6,7 @@ use std::rc::Rc;
 
 use crate::nom::Nom;
 use crate::quadtree::Quadtree;
+use crate::simulation_state::SimulationState;
 use crate::utils::draw::draw_rounded_rectangle;
 
 pub mod commands;
@@ -27,16 +28,17 @@ impl CommandLine {
         };
     }
 
-    fn submit_commands(
-        &mut self,
-        noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
-        quadtree: Rc<RefCell<Quadtree>>,
-    ) {
+    fn submit_commands(&mut self, state: Rc<RefCell<SimulationState>>) {
         self.invalid_command = false;
         match self.input_field.trim() {
-            "clear" => handle_clear(noms),
+            "clear" => handle_clear(state.borrow().get_noms()),
             input if input.starts_with("spawn nom") => {
-                handle_spawn_nom(noms, input, &mut self.invalid_command, quadtree);
+                handle_spawn_nom(
+                    state.borrow().get_noms(),
+                    input,
+                    &mut self.invalid_command,
+                    state.borrow().get_quadtree(),
+                );
             }
             _ => self.invalid_command = true,
         }
@@ -80,13 +82,9 @@ impl CommandLine {
         draw_text("Command:", 20.0, screen_height() - 24.0, 24.0, WHITE);
     }
 
-    pub fn update(
-        &mut self,
-        noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
-        quadtree: Rc<RefCell<Quadtree>>,
-    ) {
+    pub fn update(&mut self, state: Rc<RefCell<SimulationState>>) {
         if is_key_pressed(KeyCode::Enter) {
-            self.submit_commands(noms, quadtree);
+            self.submit_commands(state);
         }
         if is_key_pressed(KeyCode::Backspace) {
             self.input_field.pop();

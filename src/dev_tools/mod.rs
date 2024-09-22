@@ -6,20 +6,23 @@ use tabs::simulation_tools::SimulationTools;
 
 use crate::nom::Nom;
 use crate::quadtree::Quadtree;
+use crate::simulation_state::SimulationState;
 
 mod command_line;
 mod tab_selection;
 mod tabs;
 
 pub struct DevTools {
+    state: Rc<RefCell<SimulationState>>,
     devtools_active: bool,
     command_line: CommandLine,
     simulation_tools: SimulationTools,
 }
 
 impl DevTools {
-    pub fn new() -> Self {
+    pub fn new(state: Rc<RefCell<SimulationState>>) -> Self {
         Self {
+            state,
             devtools_active: false,
             command_line: CommandLine::new(),
             simulation_tools: SimulationTools::new(),
@@ -39,11 +42,7 @@ impl DevTools {
         self.command_line.draw();
     }
 
-    pub fn update(
-        &mut self,
-        noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
-        quadtree: Rc<RefCell<Quadtree>>,
-    ) {
+    pub fn update(&mut self) {
         if is_key_pressed(KeyCode::LeftShift) {
             self.devtools_active = !self.devtools_active;
             if self.devtools_active {
@@ -53,7 +52,7 @@ impl DevTools {
             }
         }
         if self.devtools_active {
-            self.command_line.update(noms.clone(), quadtree.clone());
+            self.command_line.update(self.state.clone());
             self.simulation_tools.update();
         }
     }

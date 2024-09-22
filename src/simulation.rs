@@ -9,6 +9,7 @@ use crate::entity_stats::EntityStats;
 use crate::nom::{Nom, NomVariant};
 use crate::plants::{PlantSpawn, Plants};
 use crate::quadtree::Quadtree;
+use crate::simulation_state::SimulationState;
 
 const DEFAULT_PLANTS_SPAWN: PlantSpawn = PlantSpawn {
     xs: 1,
@@ -19,12 +20,10 @@ const DEFAULT_PLANTS_SPAWN: PlantSpawn = PlantSpawn {
 };
 
 pub struct Simulation {
-    noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
-    plants: Plants,
+    state: Rc<RefCell<SimulationState>>,
     dev_tools: DevTools,
     environment_stats: bool,
     entity_stats: EntityStats,
-    quadtree: Rc<RefCell<Quadtree>>,
 }
 
 impl Simulation {
@@ -34,18 +33,25 @@ impl Simulation {
             NomVariant::Default,
         )))]));
         let quadtree = Rc::new(RefCell::new(Quadtree::new()));
+        let state = Rc::new(RefCell::new(SimulationState::new(
+            noms.clone(),
+            quadtree.clone(),
+            Plants::new(DEFAULT_PLANTS_SPAWN),
+        )));
         let sim = Simulation {
-            noms: noms.clone(), // Use the same noms in Simulation
-            plants: Plants::new(DEFAULT_PLANTS_SPAWN),
-            dev_tools: DevTools::new(),
+            state: state.clone(),
+            dev_tools: DevTools::new(state.clone()),
             environment_stats: false,
             entity_stats: EntityStats::new(),
-            quadtree: quadtree.clone(),
         };
 
         // Insert noms into the quadtree
         for nom in noms.borrow().iter() {
-            sim.quadtree.borrow_mut().insert(Rc::clone(nom));
+            sim.state
+                .borrow()
+                .get_quadtree()
+                .borrow_mut()
+                .insert(Rc::clone(nom));
         }
 
         sim
@@ -53,14 +59,15 @@ impl Simulation {
 
     pub fn update(&mut self) {
         {
-            let noms = self.noms.borrow(); // Borrow noms immutably
+            let noms_ref = self.state.borrow().get_noms();
+            let noms = noms_ref.borrow();
             for nom in noms.iter() {
                 nom.borrow_mut().update();
             }
         }
-        self.entity_stats.update(self.noms.clone());
-        self.dev_tools
-            .update(self.noms.clone(), self.quadtree.clone());
+        self.entity_stats
+            .update(self.state.borrow().get_noms().clone());
+        self.dev_tools.update();
         if is_key_pressed(KeyCode::I) {
             self.environment_stats = !self.environment_stats;
         }
@@ -78,13 +85,15 @@ impl Simulation {
             screen_height(),
             Color::new(0.1020, 0.1804, 0.0196, 0.15),
         );
-        self.quadtree
+        self.state
+            .borrow()
+            .get_quadtree()
             .borrow()
             .draw(self.dev_tools.quadtree_visuals_active());
-        for plant in &self.plants.plant_vec {
-            plant.draw();
-        }
-        for nom in self.noms.borrow().iter() {
+        // for plant in &self.state.plant_vec {
+        //     plant.draw();
+        // }
+        for nom in self.state.borrow().get_noms().borrow().iter() {
             nom.borrow().draw(Rc::new(RefCell::new(false)));
         }
         self.dev_tools.draw();
