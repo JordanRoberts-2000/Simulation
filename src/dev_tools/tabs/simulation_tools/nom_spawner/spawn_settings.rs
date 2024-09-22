@@ -1,7 +1,7 @@
 use ::macroquad::prelude::*;
 use std::rc::Rc;
 
-use crate::utils::ui::{selection::Selection, toggle::ToggleSwitch};
+use crate::utils::ui::{selection::Selection, toggle::Toggle};
 
 use super::NomSpawner;
 

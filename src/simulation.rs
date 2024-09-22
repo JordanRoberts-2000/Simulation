@@ -36,7 +36,7 @@ impl Simulation {
         let state = Rc::new(RefCell::new(SimulationState::new(
             noms.clone(),
             quadtree.clone(),
-            Plants::new(DEFAULT_PLANTS_SPAWN),
+            // Plants::new(DEFAULT_PLANTS_SPAWN),
         )));
         let sim = Simulation {
             state: state.clone(),
@@ -49,7 +49,7 @@ impl Simulation {
         for nom in noms.borrow().iter() {
             sim.state
                 .borrow()
-                .get_quadtree()
+                .quadtree()
                 .borrow_mut()
                 .insert(Rc::clone(nom));
         }
@@ -59,14 +59,14 @@ impl Simulation {
 
     pub fn update(&mut self) {
         {
-            let noms_ref = self.state.borrow().get_noms();
+            let noms_ref = self.state.borrow().noms();
             let noms = noms_ref.borrow();
             for nom in noms.iter() {
-                nom.borrow_mut().update();
+                nom.borrow_mut()
+                    .update(self.state.borrow().behaviors().movement());
             }
         }
-        self.entity_stats
-            .update(self.state.borrow().get_noms().clone());
+        self.entity_stats.update(self.state.borrow().noms());
         self.dev_tools.update();
         if is_key_pressed(KeyCode::I) {
             self.environment_stats = !self.environment_stats;
@@ -87,13 +87,13 @@ impl Simulation {
         );
         self.state
             .borrow()
-            .get_quadtree()
+            .quadtree()
             .borrow()
             .draw(self.dev_tools.quadtree_visuals_active());
         // for plant in &self.state.plant_vec {
         //     plant.draw();
         // }
-        for nom in self.state.borrow().get_noms().borrow().iter() {
+        for nom in self.state.borrow().noms().borrow().iter() {
             nom.borrow().draw(Rc::new(RefCell::new(false)));
         }
         self.dev_tools.draw();
@@ -105,6 +105,8 @@ impl Simulation {
     }
 
     pub fn draw_stats(&self) {
-        draw_text("Number of noms:", screen_width() - 200.0, 30.0, 20.0, WHITE);
+        let nom_amount = self.state.borrow().noms().borrow().len();
+        let text = format!("Number of noms: {}", nom_amount);
+        draw_text(&text, screen_width() - 200.0, 30.0, 20.0, WHITE);
     }
 }

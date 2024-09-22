@@ -31,15 +31,17 @@ impl CommandLine {
     fn submit_commands(&mut self, state: Rc<RefCell<SimulationState>>) {
         self.invalid_command = false;
         match self.input_field.trim() {
-            "clear" => handle_clear(state.borrow().get_noms()),
+            "clear" => handle_clear(state.borrow().noms()),
             input if input.starts_with("spawn nom") => {
                 handle_spawn_nom(
-                    state.borrow().get_noms(),
+                    state.borrow().noms(),
                     input,
                     &mut self.invalid_command,
-                    state.borrow().get_quadtree(),
+                    state.borrow().quadtree(),
                 );
             }
+            "freeze" => handle_freeze(state.borrow_mut().behaviors_mut().movement_mut()),
+            "unfreeze" => handle_unfreeze(state.borrow_mut().behaviors_mut().movement_mut()),
             _ => self.invalid_command = true,
         }
         self.store_command(self.input_field.clone());

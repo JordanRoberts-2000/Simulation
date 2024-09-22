@@ -21,11 +21,12 @@ pub struct DevTools {
 
 impl DevTools {
     pub fn new(state: Rc<RefCell<SimulationState>>) -> Self {
+        let state = state.clone();
         Self {
-            state,
+            state: state.clone(),
             devtools_active: false,
             command_line: CommandLine::new(),
-            simulation_tools: SimulationTools::new(),
+            simulation_tools: SimulationTools::new(state.clone()),
         }
     }
 

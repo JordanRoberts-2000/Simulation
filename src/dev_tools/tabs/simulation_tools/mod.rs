@@ -1,4 +1,6 @@
-use crate::utils::ui::button::Button;
+use std::{cell::RefCell, rc::Rc};
+
+use crate::{simulation_state::SimulationState, utils::ui::button::Button};
 // use nom_spawner::NomSpawner;
 use simulation_toggles::{SimulationToggles, ToggleKey};
 
@@ -13,11 +15,11 @@ pub struct SimulationTools {
 }
 
 impl SimulationTools {
-    pub fn new() -> Self {
+    pub fn new(state: Rc<RefCell<SimulationState>>) -> Self {
         Self {
             // nom_spawner: NomSpawner::new(),
             simulation_toggles: SimulationToggles::new(),
-            command_buttons: SimulationTools::create_command_buttons(),
+            command_buttons: SimulationTools::create_command_buttons(state),
         }
     }
 

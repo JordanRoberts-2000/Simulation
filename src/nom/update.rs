@@ -3,11 +3,13 @@ use macroquad::prelude::*;
 use super::{utils::lerp_angle, Nom};
 
 impl Nom {
-    pub fn update(&mut self) {
+    pub fn update(&mut self, can_move: bool) {
         let delta_time = get_frame_time();
         // println!("o: {}, t_o: {}", self.orientation, self.target_orientation);
-        self.update_orientation(delta_time);
-        self.update_position(&delta_time);
+        if can_move {
+            self.update_orientation(delta_time);
+            self.update_position(&delta_time);
+        }
     }
     fn update_position(&mut self, delta_time: &f32) {
         self.current_speed =

@@ -9,6 +9,14 @@ pub fn handle_clear(noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>) {
     noms.borrow_mut().clear()
 }
 
+pub fn handle_freeze(movement: &mut bool) {
+    *movement = false;
+}
+
+pub fn handle_unfreeze(movement: &mut bool) {
+    *movement = true;
+}
+
 pub fn handle_spawn_nom(
     noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
     input: &str,
