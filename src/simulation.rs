@@ -89,7 +89,7 @@ impl Simulation {
             .borrow()
             .quadtree()
             .borrow()
-            .draw(self.dev_tools.quadtree_visuals_active());
+            .draw(self.state.borrow().visuals().quadtree());
         // for plant in &self.state.plant_vec {
         //     plant.draw();
         // }

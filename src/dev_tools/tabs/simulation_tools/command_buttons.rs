@@ -13,7 +13,7 @@ impl SimulationTools {
     pub fn create_command_buttons(state: Rc<RefCell<SimulationState>>) -> Vec<Button> {
         let mut command_buttons = Vec::new();
 
-        let command_buttons_y: f32 = 674.0;
+        let command_buttons_y: f32 = 668.0;
         let mut clear_button = Button::new("clear");
         clear_button.pos(28.0, command_buttons_y);
         clear_button.on_click({
@@ -25,7 +25,7 @@ impl SimulationTools {
         command_buttons.push(clear_button);
 
         let mut restart_button = Button::new("restart");
-        restart_button.pos(100.0, command_buttons_y);
+        restart_button.pos(92.0, command_buttons_y);
         restart_button.on_click(|| println!("restart"));
         command_buttons.push(restart_button);
 

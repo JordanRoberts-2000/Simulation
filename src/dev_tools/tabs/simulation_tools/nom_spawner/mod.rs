@@ -4,10 +4,11 @@ use macroquad::prelude::*;
 use spawn_settings::{NomLifeCycle, NomTwins};
 
 use crate::nom::Nom;
+use crate::simulation_state::SimulationState;
 use crate::utils::ui::button::Button;
 use crate::utils::ui::selection::Selection;
 use crate::utils::ui::slider::Slider;
-use crate::utils::ui::toggle::ToggleSwitch;
+use crate::utils::ui::toggle::Toggle;
 
 mod nom_selector;
 mod spawn_buttons;
@@ -17,7 +18,7 @@ pub struct NomSpawner {
     nom_selection_index: (usize, usize),
     display_noms: Vec<Nom>,
     spike_random: Rc<RefCell<bool>>,
-    spike_random_toggle: Option<ToggleSwitch>,
+    spike_random_toggle: Toggle,
     spike_amount: u32,
     spike_amount_slider: Slider,
     life_cycle: NomLifeCycle,
@@ -28,19 +29,19 @@ pub struct NomSpawner {
 }
 
 impl NomSpawner {
-    pub fn new() -> Self {
+    pub fn new(state: Rc<RefCell<SimulationState>>) -> Self {
         let mut nom_spawner = Self {
             nom_selection_index: (0, 0),
             display_noms: NomSpawner::display_noms(),
             spike_random: Rc::new(RefCell::new(false)),
-            spike_random_toggle: None,
+            spike_random_toggle: Toggle::new(350.0, 594.0),
             spike_amount: 0,
             spike_amount_slider: Slider::new(5),
             life_cycle: NomLifeCycle::Adult,
             life_cycle_selection: NomSpawner::create_life_cycle_selector(),
             twins: NomTwins::Off,
             twins_selection: NomSpawner::create_twins_selector(),
-            spawn_buttons: NomSpawner::create_spawn_buttons(),
+            spawn_buttons: NomSpawner::create_spawn_buttons(state.borrow_mut().noms()),
         };
         nom_spawner.configure_spawn_settings();
         nom_spawner
@@ -52,7 +53,7 @@ impl NomSpawner {
         self.draw_spawn_buttons();
     }
 
-    pub fn update(&mut self) {
+    pub fn update(&mut self, state: Rc<RefCell<SimulationState>>) {
         self.update_spawn_settings();
         self.update_nom_selector();
         self.update_spawn_buttons();

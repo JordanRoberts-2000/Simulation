@@ -4,8 +4,6 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use tabs::simulation_tools::SimulationTools;
 
-use crate::nom::Nom;
-use crate::quadtree::Quadtree;
 use crate::simulation_state::SimulationState;
 
 mod command_line;
@@ -54,12 +52,8 @@ impl DevTools {
         }
         if self.devtools_active {
             self.command_line.update(self.state.clone());
-            self.simulation_tools.update();
+            self.simulation_tools.update(self.state.clone());
         }
-    }
-
-    pub fn quadtree_visuals_active(&self) -> bool {
-        self.simulation_tools.get_quadtree_visual_value()
     }
 
     pub fn is_active(&self) -> bool {

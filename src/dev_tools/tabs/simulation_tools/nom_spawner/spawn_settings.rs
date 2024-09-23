@@ -23,17 +23,13 @@ pub enum NomTwins {
 
 impl NomSpawner {
     pub fn configure_spawn_settings(&mut self) {
-        self.create_random_spike_toggle();
-        self.set_random_spike_toggle(350.0, 594.0);
         self.spike_amount_slider.set(106.0, 592.0, 140.0);
         self.life_cycle_selection.set(100.0, 565.0);
         self.twins_selection.set(100.0, 530.0);
     }
 
     pub fn draw_spawn_settings(&self) {
-        if let Some(toggle) = &self.spike_random_toggle {
-            toggle.draw();
-        }
+        self.spike_random_toggle.draw();
         self.spike_amount_slider.draw();
         self.life_cycle_selection.draw();
         self.twins_selection.draw();
@@ -44,28 +40,13 @@ impl NomSpawner {
     }
 
     pub fn update_spawn_settings(&mut self) {
-        if let Some(toggle) = &mut self.spike_random_toggle {
-            toggle.update();
-        }
+        self.spike_random_toggle.update();
         self.spike_amount_slider.update();
         self.spike_amount = self.spike_amount_slider.get_index();
         self.life_cycle_selection.update();
         self.life_cycle = self.life_cycle_selection.get_selected();
         self.twins_selection.update();
         self.twins = self.twins_selection.get_selected();
-    }
-
-    fn create_random_spike_toggle(&mut self) {
-        let spike_random_clone_on = Rc::clone(&self.spike_random);
-        let spike_random_clone_off = Rc::clone(&self.spike_random);
-        self.spike_random_toggle = Some(ToggleSwitch::new(
-            Box::new(move || {
-                *spike_random_clone_on.borrow_mut() = true;
-            }),
-            Box::new(move || {
-                *spike_random_clone_off.borrow_mut() = false;
-            }),
-        ));
     }
 
     pub fn create_life_cycle_selector() -> Selection<NomLifeCycle> {
@@ -86,11 +67,5 @@ impl NomSpawner {
             ("Random", NomTwins::Random),
         ];
         Selection::new(options, NomTwins::Off)
-    }
-
-    fn set_random_spike_toggle(&mut self, x: f32, y: f32) {
-        if let Some(toggle) = &mut self.spike_random_toggle {
-            toggle.set(x, y);
-        }
     }
 }

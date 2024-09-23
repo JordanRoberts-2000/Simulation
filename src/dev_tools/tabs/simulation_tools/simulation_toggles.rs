@@ -1,11 +1,8 @@
+use std::{cell::RefCell, rc::Rc};
+
 use macroquad::prelude::*;
 
-use crate::utils::ui::toggle::Toggle;
-
-pub enum ToggleKey {
-    Quadtree,
-    Grid,
-}
+use crate::{simulation_state::SimulationState, utils::ui::toggle::Toggle};
 
 pub struct SimulationToggles {
     quadtree_visuals_toggle: Toggle,
@@ -29,15 +26,10 @@ impl SimulationToggles {
         self.quadtree_visuals_toggle.draw();
     }
 
-    pub fn update(&mut self) {
+    pub fn update(&mut self, state: Rc<RefCell<SimulationState>>) {
         self.quadtree_visuals_toggle.update();
         self.grid_visuals_toggle.update();
-    }
-
-    pub fn get_toggle_value(&self, key: ToggleKey) -> bool {
-        match key {
-            ToggleKey::Quadtree => self.quadtree_visuals_toggle.get_value(),
-            ToggleKey::Grid => self.grid_visuals_toggle.get_value(),
-        }
+        *state.borrow_mut().visuals_mut().quadtree_mut() = self.quadtree_visuals_toggle.get_value();
+        *state.borrow_mut().visuals_mut().grid_mut() = self.grid_visuals_toggle.get_value();
     }
 }
