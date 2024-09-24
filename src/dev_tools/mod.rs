@@ -35,7 +35,7 @@ impl DevTools {
         // Devtools side bar:
         draw_rectangle(0., 0., 400., screen_height(), Color::new(0., 0., 0., 0.7));
         self.draw_tab_selection();
-        self.simulation_tools.draw();
+        self.simulation_tools.draw(self.state.clone());
 
         draw_line(400., 0., 400., screen_height(), 1.0, GRAY);
         self.command_line.draw();

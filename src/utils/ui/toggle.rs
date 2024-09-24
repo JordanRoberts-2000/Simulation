@@ -6,30 +6,18 @@ const DEFAULT_TOGGLE_HEIGHT: f32 = 10.;
 
 pub struct Toggle {
     position: Vec2,
-    is_active: bool, // Internal state for the toggle
 }
 
 impl Toggle {
-    // Initialize the toggle with an internal state (default to false)
+    // Initialize the toggle with a position
     pub fn new(x: f32, y: f32) -> Self {
         Self {
             position: vec2(x, y),
-            is_active: false, // Default to inactive
         }
     }
 
-    // Method to get the current state (true if active, false if inactive)
-    pub fn get_value(&self) -> bool {
-        self.is_active
-    }
-
-    // Toggle the boolean value
-    pub fn toggle(&mut self) {
-        self.is_active = !self.is_active; // Toggle the internal state
-    }
-
-    // Check for mouse input and update the toggle state
-    pub fn update(&mut self) {
+    // Check for mouse input and update the provided mutable reference state
+    pub fn update(&mut self, is_active: &mut bool) {
         let mouse_position = mouse_position(); // Get the mouse position
 
         let padding = 6.0; // Add padding to make the click area bigger
@@ -46,14 +34,14 @@ impl Toggle {
         if is_mouse_button_pressed(MouseButton::Left)
             && toggle_bounds.contains(vec2(mouse_position.0, mouse_position.1))
         {
-            self.toggle(); // Toggle the internal boolean state
+            *is_active = !*is_active; // Toggle the provided boolean reference
         }
     }
 
-    // Draw the toggle switch
-    pub fn draw(&self) {
-        // Use the internal state to determine the toggle's appearance
-        let color = if self.is_active { BLUE } else { WHITE };
+    // Draw the toggle switch based on the provided boolean reference
+    pub fn draw(&self, is_active: &bool) {
+        // Use the provided boolean reference to determine the toggle's appearance
+        let color = if *is_active { BLUE } else { WHITE };
         draw_rounded_rectangle(
             self.position.x - DEFAULT_TOGGLE_WIDTH / 2.,
             self.position.y - DEFAULT_TOGGLE_HEIGHT / 2.,
@@ -64,7 +52,7 @@ impl Toggle {
         );
         draw_circle(
             self.position.x
-                + (if self.is_active {
+                + (if *is_active {
                     DEFAULT_TOGGLE_WIDTH / 4.
                 } else {
                     -DEFAULT_TOGGLE_WIDTH / 4.
@@ -75,7 +63,7 @@ impl Toggle {
         );
         draw_circle(
             self.position.x
-                + (if self.is_active {
+                + (if *is_active {
                     DEFAULT_TOGGLE_WIDTH / 4.
                 } else {
                     -DEFAULT_TOGGLE_WIDTH / 4.

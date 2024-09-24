@@ -1,7 +1,7 @@
 use ::macroquad::prelude::*;
-use std::rc::Rc;
+use std::{cell::RefCell, rc::Rc};
 
-use crate::utils::ui::{selection::Selection, toggle::Toggle};
+use crate::{simulation_state::SimulationState, utils::ui::selection::Selection};
 
 use super::NomSpawner;
 
@@ -28,8 +28,9 @@ impl NomSpawner {
         self.twins_selection.set(100.0, 530.0);
     }
 
-    pub fn draw_spawn_settings(&self) {
-        self.spike_random_toggle.draw();
+    pub fn draw_spawn_settings(&self, state: Rc<RefCell<SimulationState>>) {
+        self.spike_random_toggle
+            .draw(&state.borrow().behaviors().spike_mutation());
         self.spike_amount_slider.draw();
         self.life_cycle_selection.draw();
         self.twins_selection.draw();
@@ -39,8 +40,9 @@ impl NomSpawner {
         draw_text("Spikes:", 20.0, 600.0, 22.0, WHITE);
     }
 
-    pub fn update_spawn_settings(&mut self) {
-        self.spike_random_toggle.update();
+    pub fn update_spawn_settings(&mut self, state: Rc<RefCell<SimulationState>>) {
+        self.spike_random_toggle
+            .update(state.borrow_mut().behaviors_mut().spike_mutation_mut());
         self.spike_amount_slider.update();
         self.spike_amount = self.spike_amount_slider.get_index();
         self.life_cycle_selection.update();

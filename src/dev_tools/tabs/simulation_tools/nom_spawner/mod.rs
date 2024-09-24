@@ -47,14 +47,14 @@ impl NomSpawner {
         nom_spawner
     }
 
-    pub fn draw(&self) {
-        self.draw_spawn_settings();
+    pub fn draw(&self, state: Rc<RefCell<SimulationState>>) {
+        self.draw_spawn_settings(state);
         self.draw_nom_selector();
         self.draw_spawn_buttons();
     }
 
     pub fn update(&mut self, state: Rc<RefCell<SimulationState>>) {
-        self.update_spawn_settings();
+        self.update_spawn_settings(state);
         self.update_nom_selector();
         self.update_spawn_buttons();
     }

@@ -29,9 +29,9 @@ impl SimulationTools {
         self.simulation_toggles.update(state);
     }
 
-    pub fn draw(&self) {
-        self.nom_spawner.draw();
+    pub fn draw(&self, state: Rc<RefCell<SimulationState>>) {
+        self.nom_spawner.draw(state.clone());
         self.draw_command_buttons();
-        self.simulation_toggles.draw();
+        self.simulation_toggles.draw(state);
     }
 }

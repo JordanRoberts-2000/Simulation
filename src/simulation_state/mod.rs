@@ -49,7 +49,7 @@ generate_getters!(
 );
 
 generate_mut_getters!(
-  SimulationState,
-  nom_mut: noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
-  quadtree_mut: quadtree: Rc<RefCell<Quadtree>>
+    SimulationState,
+    // nom_mut: noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>, <-- not needed cause clone
+    // quadtree_mut: quadtree: Rc<RefCell<Quadtree>>  <-- not needed
 );
