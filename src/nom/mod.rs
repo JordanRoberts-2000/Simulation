@@ -54,6 +54,7 @@ pub struct Nom {
     look_ahead_distance: f32,
     look_ahead_size: f32,
     look_ahead_target: Vec2,
+    stats_active: bool,
 }
 
 impl Nom {
@@ -81,10 +82,11 @@ impl Nom {
             look_ahead_distance: size * 2.0,
             look_ahead_size: size * 2.0,
             look_ahead_target: vec2(0.0, 0.0),
+            stats_active: false,
         }
     }
 
-    pub fn spawn_random() -> Self {
+    pub fn spawn_random(variant: NomVariant) -> Self {
         // get random position,
         // check quadtree for collisions
         // add to quadtree
@@ -99,7 +101,7 @@ impl Nom {
                 rng.gen_range(size / 2.0..screen_width() - size / 2.0),
                 rng.gen_range(size / 2.0..screen_height() - size / 2.0),
             ),
-            variant: NomVariant::Default,
+            variant,
             target_position: Vec2::ZERO,
             current_speed: 0.0,                             // Scalar speed
             orientation: starting_orientation.to_radians(), // Initial orientation
@@ -115,6 +117,7 @@ impl Nom {
             look_ahead_distance: size * 2.0,
             look_ahead_size: size * 2.0,
             look_ahead_target: vec2(0.0, 0.0),
+            stats_active: false,
         }
     }
 
@@ -148,6 +151,7 @@ impl Nom {
             look_ahead_distance: size * 1.25,
             look_ahead_size: size,
             look_ahead_target: vec2(0.0, 0.0),
+            stats_active: false,
         }
     }
 
@@ -169,5 +173,13 @@ impl Nom {
             acceleration: self.acceleration,
             orientation: self.orientation,
         };
+    }
+
+    pub fn show_stats(&mut self) {
+        self.stats_active = true;
+    }
+
+    pub fn hide_stats(&mut self) {
+        self.stats_active = false;
     }
 }

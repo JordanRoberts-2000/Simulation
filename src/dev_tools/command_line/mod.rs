@@ -4,8 +4,6 @@ use std::cell::RefCell;
 use std::collections::VecDeque;
 use std::rc::Rc;
 
-use crate::nom::Nom;
-use crate::quadtree::Quadtree;
 use crate::simulation_state::SimulationState;
 use crate::utils::draw::draw_rounded_rectangle;
 

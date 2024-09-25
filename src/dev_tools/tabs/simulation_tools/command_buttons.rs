@@ -11,25 +11,17 @@ use crate::dev_tools::SimulationTools;
 
 impl SimulationTools {
     pub fn create_command_buttons(state: Rc<RefCell<SimulationState>>) -> Vec<Button> {
-        let mut command_buttons = Vec::new();
-
         let command_buttons_y: f32 = 668.0;
+
         let mut clear_button = Button::new("clear");
         clear_button.pos(28.0, command_buttons_y);
-        clear_button.on_click({
-            let noms = state.borrow().noms().clone();
-            move || {
-                handle_clear(noms.clone());
-            }
-        });
-        command_buttons.push(clear_button);
+        clear_button.on_click(move || clear_noms(state.clone()));
 
         let mut restart_button = Button::new("restart");
         restart_button.pos(92.0, command_buttons_y);
-        restart_button.on_click(|| println!("restart"));
-        command_buttons.push(restart_button);
+        restart_button.on_click(restart_sim);
 
-        command_buttons
+        vec![clear_button, restart_button]
     }
 
     pub fn draw_command_buttons(&self) {
@@ -43,4 +35,13 @@ impl SimulationTools {
             button.update();
         }
     }
+}
+
+fn clear_noms(state: Rc<RefCell<SimulationState>>) {
+    let noms = state.borrow().noms().clone();
+    handle_clear(noms.clone());
+}
+
+fn restart_sim() {
+    println!("restart");
 }

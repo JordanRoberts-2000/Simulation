@@ -94,7 +94,7 @@ impl Simulation {
         //     plant.draw();
         // }
         for nom in self.state.borrow().noms().borrow().iter() {
-            nom.borrow().draw(Rc::new(RefCell::new(false)));
+            nom.borrow().draw();
         }
         self.dev_tools.draw();
         self.entity_stats.draw();

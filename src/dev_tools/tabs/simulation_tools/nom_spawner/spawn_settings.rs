@@ -11,7 +11,6 @@ pub enum NomLifeCycle {
     Adult,
     Old,
     Dead,
-    Zombie,
 }
 
 #[derive(Clone, PartialEq)]
@@ -57,7 +56,6 @@ impl NomSpawner {
             ("Adult", NomLifeCycle::Adult),
             ("Old", NomLifeCycle::Old),
             ("Dead", NomLifeCycle::Dead),
-            ("Zombie", NomLifeCycle::Zombie),
         ];
         Selection::new(options, NomLifeCycle::Adult)
     }

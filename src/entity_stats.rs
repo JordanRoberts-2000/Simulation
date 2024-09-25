@@ -20,35 +20,38 @@ impl EntityStats {
 
     pub fn update(&mut self, noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>) {
         if is_mouse_button_pressed(MouseButton::Left) {
-            // Get the mouse position
-            let mouse_position = mouse_position(); // Returns (x, y) tuple
-
-            // Borrow the noms vector
+            let mouse_position = mouse_position();
             let noms_borrow = noms.borrow();
-
-            // Iterate through each Nom in the noms array
             let mut found_nom = false;
             for nom_ref in noms_borrow.iter() {
-                let nom = nom_ref.borrow(); // Borrow the Nom
+                {
+                    let nom = nom_ref.borrow();
+                    let nom_position = nom.position;
+                    let distance = ((mouse_position.0 - nom_position.x).powi(2)
+                        + (mouse_position.1 - nom_position.y).powi(2))
+                    .sqrt();
 
-                // Get the Nom's position
-                let nom_position = nom.position;
-
-                // Calculate the distance between the mouse position and the nom's position
-                let distance = ((mouse_position.0 - nom_position.x).powi(2)
-                    + (mouse_position.1 - nom_position.y).powi(2))
-                .sqrt();
-
-                // Check if the distance is within 5 pixels
-                if distance <= nom_ref.borrow().size / 2.0 {
-                    // The Nom is within 5 pixels of the click, perform action (e.g., retrieve)
-                    self.current_nom = Some(nom_ref.clone());
-                    found_nom = true;
-                    break;
-                    // You can handle the retrieval logic here
+                    if distance > nom.size / 2.0 {
+                        continue;
+                    }
                 }
+
+                nom_ref.borrow_mut().show_stats();
+                found_nom = true;
+                if let Some(current_nom) = &self.current_nom {
+                    if !Rc::ptr_eq(current_nom, nom_ref) {
+                        current_nom.borrow_mut().hide_stats();
+                    }
+                }
+
+                self.current_nom = Some(nom_ref.clone());
+                break;
             }
+
             if !found_nom {
+                if let Some(current_nom) = &self.current_nom {
+                    current_nom.borrow_mut().hide_stats();
+                }
                 self.current_nom = None;
             }
         }
@@ -59,10 +62,7 @@ impl EntityStats {
             return;
         }
         if let Some(current_nom) = &self.current_nom {
-            // Borrow and get the stats of the `Nom`
             let nom_stats = current_nom.borrow().get_stats();
-
-            // Display stats
             let orientation = format!("Orientation: {}", nom_stats.orientation);
             let current_speed = format!("Current Speed: {}", nom_stats.current_speed);
             let max_speed = format!("Max Speed: {}", nom_stats.max_speed);

@@ -1,8 +1,7 @@
-use macroquad::math::vec2;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::nom::Nom;
+use crate::nom::{Nom, NomVariant};
 use crate::quadtree::Quadtree;
 
 pub fn handle_clear(noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>) {
@@ -26,7 +25,7 @@ pub fn handle_spawn_nom(
     let parts: Vec<&str> = input.split_whitespace().collect();
     if parts.len() == 2 {
         let mut nearby_noms: Vec<Rc<RefCell<Nom>>> = Vec::new();
-        let new_nom = Nom::spawn_random();
+        let new_nom = Nom::spawn_random(NomVariant::Default);
         quadtree.borrow().retrieve(&mut nearby_noms, &new_nom);
         let mut no_collisions = true;
         for nom in nearby_noms {
@@ -46,7 +45,7 @@ pub fn handle_spawn_nom(
             if number >= 1 {
                 for _ in 0..number {
                     let mut nearby_noms: Vec<Rc<RefCell<Nom>>> = Vec::new();
-                    let new_nom = Nom::spawn_random();
+                    let new_nom = Nom::spawn_random(NomVariant::Default);
                     quadtree.borrow().retrieve(&mut nearby_noms, &new_nom);
                     let mut no_collisions = true;
                     for nom in nearby_noms {

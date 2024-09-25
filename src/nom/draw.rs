@@ -1,17 +1,17 @@
 use macroquad::prelude::*;
-use std::cell::RefCell;
-use std::rc::Rc;
 
 use super::{Nom, NomVariant};
 
 impl Nom {
-    pub fn draw(&self, testing_visuals: Rc<RefCell<bool>>) {
+    pub fn draw(&self) {
+        if self.stats_active {
+            self.draw_viewing_stats();
+        }
         self.draw_body();
         self.draw_mutation();
-        // self.draw_testing_visuals();
-        if *testing_visuals.borrow() {
-            self.draw_testing_visuals();
-        }
+        // if *testing_visuals.borrow() {
+        //     self.draw_testing_visuals();
+        // }
     }
 
     fn draw_body(&self) {
@@ -32,7 +32,6 @@ impl Nom {
                 Color::new(0.9961, 0.0, 0.9961, 1.0),
             ),
         };
-
         draw_circle(
             self.position[0],
             self.position[1],
@@ -133,6 +132,21 @@ impl Nom {
             point.x * cos_theta - point.y * sin_theta, // New x after rotation
             point.x * sin_theta + point.y * cos_theta, // New y after rotation
         )
+    }
+
+    pub fn draw_viewing_stats(&self) {
+        draw_circle(
+            self.position[0],
+            self.position[1],
+            (self.size / 2.0) + 3.0,
+            Color::new(0.0, 0.0, 0.9882, 0.3),
+        );
+        draw_circle(
+            self.position[0],
+            self.position[1],
+            (self.size / 2.0) + 7.0,
+            Color::new(0.0, 0.0, 0.9882, 0.3),
+        );
     }
 
     pub fn draw_testing_visuals(&self) {

@@ -33,7 +33,7 @@ impl DevTools {
             return;
         };
         // Devtools side bar:
-        draw_rectangle(0., 0., 400., screen_height(), Color::new(0., 0., 0., 0.7));
+        draw_rectangle(0., 0., 400., screen_height(), Color::new(0., 0., 0., 0.8));
         self.draw_tab_selection();
         self.simulation_tools.draw(self.state.clone());
 

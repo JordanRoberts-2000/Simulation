@@ -3,7 +3,7 @@ use std::{cell::RefCell, rc::Rc};
 use macroquad::prelude::*;
 use spawn_settings::{NomLifeCycle, NomTwins};
 
-use crate::nom::Nom;
+use crate::nom::{Nom, NomVariant};
 use crate::simulation_state::SimulationState;
 use crate::utils::ui::button::Button;
 use crate::utils::ui::selection::Selection;
@@ -15,9 +15,8 @@ mod spawn_buttons;
 mod spawn_settings;
 
 pub struct NomSpawner {
-    nom_selection_index: (usize, usize),
+    nom_variant_selected: Rc<RefCell<NomVariant>>,
     display_noms: Vec<Nom>,
-    spike_random: Rc<RefCell<bool>>,
     spike_random_toggle: Toggle,
     spike_amount: u32,
     spike_amount_slider: Slider,
@@ -30,10 +29,10 @@ pub struct NomSpawner {
 
 impl NomSpawner {
     pub fn new(state: Rc<RefCell<SimulationState>>) -> Self {
+        let selected_variant = Rc::new(RefCell::new(NomVariant::Default));
         let mut nom_spawner = Self {
-            nom_selection_index: (0, 0),
-            display_noms: NomSpawner::display_noms(),
-            spike_random: Rc::new(RefCell::new(false)),
+            nom_variant_selected: selected_variant.clone(),
+            display_noms: NomSpawner::create_display_noms(),
             spike_random_toggle: Toggle::new(350.0, 594.0),
             spike_amount: 0,
             spike_amount_slider: Slider::new(5),
@@ -41,7 +40,10 @@ impl NomSpawner {
             life_cycle_selection: NomSpawner::create_life_cycle_selector(),
             twins: NomTwins::Off,
             twins_selection: NomSpawner::create_twins_selector(),
-            spawn_buttons: NomSpawner::create_spawn_buttons(state.borrow_mut().noms()),
+            spawn_buttons: NomSpawner::create_spawn_buttons(
+                state.borrow_mut().noms(),
+                selected_variant,
+            ),
         };
         nom_spawner.configure_spawn_settings();
         nom_spawner
