@@ -2,44 +2,85 @@ use macroquad::prelude::*;
 
 use super::{Nom, NomVariant};
 
+#[derive(Clone)]
+pub struct NomColors {
+    body_color: Color,
+    border_color: Color,
+    glow_color: Color,
+    mutation_color: Color,
+}
+
 impl Nom {
     pub fn draw(&self) {
         if self.stats_active {
             self.draw_viewing_stats();
         }
         self.draw_body();
+        self.draw_glow();
         self.draw_mutation();
         // if *testing_visuals.borrow() {
         //     self.draw_testing_visuals();
         // }
     }
 
-    fn draw_body(&self) {
-        let (color, border_color) = match self.variant {
-            NomVariant::Wendigo => (Color::from_hex(0x450a0a), Color::from_hex(0xdc2626)),
-            NomVariant::Death => (BLACK, Color::from_hex(0x525252)),
-            NomVariant::Leviathan => (
-                Color::new(0.2, 0.0, 0.2, 1.0),
-                Color::new(0.2, 0.0, 0.2, 1.0),
-            ),
-            NomVariant::Whale => (
-                Color::new(0.2, 0.0, 0.2, 1.0),
-                Color::new(0.2, 0.0, 0.2, 1.0),
-            ),
-            NomVariant::Shark => (Color::from_hex(0x1e3a8a), Color::from_hex(0x3b82f6)),
-            _ => (
-                Color::new(0.2, 0.0, 0.2, 1.0),
-                Color::new(0.9961, 0.0, 0.9961, 1.0),
-            ),
+    pub fn get_colors(variant: &NomVariant) -> NomColors {
+        let body_color = match variant {
+            NomVariant::Wendigo => Color::from_hex(0x450a0a),
+            NomVariant::Death => BLACK,
+            NomVariant::Leviathan => Color::new(0.2, 0.0, 0.2, 1.0),
+            NomVariant::Whale => Color::new(0.2, 0.0, 0.2, 1.0),
+            NomVariant::Shark => Color::from_hex(0x1e3a8a),
+            _ => Color::new(0.2, 0.0, 0.2, 1.0),
         };
+
+        let border_color = match variant {
+            NomVariant::Wendigo => Color::from_hex(0x450a0a),
+            NomVariant::Whale => Color::new(0.2, 0.0, 0.2, 1.0),
+            NomVariant::Death => Color::from_hex(0x525252),
+            NomVariant::Shark => Color::from_hex(0x3b82f6),
+            _ => Color::new(0.9961, 0.0, 0.9961, 1.0), // Default border color
+        };
+
+        let glow_color = match variant {
+            NomVariant::Default => Color::new(0.9961, 0.0, 0.9961, 1.0),
+            NomVariant::BlueMutation => Color::new(0.231, 0.510, 0.965, 1.0),
+            NomVariant::GreenMutation => GREEN,
+            NomVariant::RedMutation => RED,
+            NomVariant::Hedgehog => YELLOW,
+            NomVariant::Wendigo => RED,
+            NomVariant::Shark => Color::new(0.9961, 0.0, 0.9961, 1.0),
+            NomVariant::Death => Color::from_hex(0x991b1b),
+            _ => Color::new(0.0, 0.0, 0.0, 0.0), // Default glow color
+        };
+
+        let mutation_color = match variant {
+            NomVariant::Default => Color::new(0.9961, 0.0, 0.9961, 1.0),
+            NomVariant::BlueMutation => Color::new(0.231, 0.510, 0.965, 1.0),
+            NomVariant::GreenMutation => GREEN,
+            NomVariant::RedMutation => RED,
+            NomVariant::Hedgehog => YELLOW,
+            NomVariant::Wendigo => RED,
+            NomVariant::Shark => RED,
+            NomVariant::Death => Color::from_hex(0x991b1b),
+            _ => Color::new(0.9961, 0.0, 0.9961, 1.0),
+        };
+        NomColors {
+            body_color,
+            border_color,
+            glow_color,
+            mutation_color,
+        }
+    }
+
+    fn draw_body(&self) {
         draw_circle(
             self.position[0],
             self.position[1],
             self.size / 2.0,
             if self.size >= 4.0 {
-                border_color
+                self.colors.border_color
             } else {
-                color
+                self.colors.body_color
             },
         );
         match self.variant {
@@ -68,47 +109,68 @@ impl Nom {
                     draw_circle(
                         self.position[0],
                         self.position[1],
-                        (self.size / 2.0) - if self.size >= 14.0 { 1.5 } else { 1.0 },
-                        color,
+                        (self.size / 2.0) - if self.size > 18.0 { 2.0 } else { 1.5 },
+                        self.colors.body_color,
                     );
                 }
             }
         }
     }
 
+    pub fn draw_glow(&self) {
+        if self.variant == NomVariant::Leviathan || self.variant == NomVariant::Whale {
+            return;
+        }
+        let offset = match self.variant {
+            NomVariant::Wendigo | NomVariant::Hedgehog => 2.0,
+            _ => 4.0,
+        };
+        let transparancy = match self.variant {
+            NomVariant::Hedgehog => 0.3,
+            _ => 0.2,
+        };
+
+        draw_circle(
+            self.position[0],
+            self.position[1],
+            ((self.size / 2.0) - offset) - if self.size > 18.0 { 2.0 } else { 1.5 },
+            Color::new(
+                self.colors.glow_color.r,
+                self.colors.glow_color.g,
+                self.colors.glow_color.b,
+                transparancy,
+            ),
+        );
+        // draw_circle(
+        //     self.position[0],
+        //     self.position[1],
+        //     ((self.size / 2.0) - 2.0) - if self.size > 18.0 { 2.0 } else { 1.5 },
+        //     Color::new(YELLOW.r, YELLOW.g, YELLOW.b, 0.3),
+        // );
+    }
+
     fn draw_mutation(&self) {
         if self.variant == NomVariant::Leviathan || self.variant == NomVariant::Whale {
             return;
         }
-        let mutation_color = match self.variant {
-            NomVariant::Default => Color::new(0.9961, 0.0, 0.9961, 1.0),
-            NomVariant::BlueMutation => Color::new(0.231, 0.510, 0.965, 1.0),
-            NomVariant::GreenMutation => GREEN,
-            NomVariant::RedMutation => RED,
-            NomVariant::Hedgehog => YELLOW,
-            NomVariant::Wendigo => RED,
-            NomVariant::Shark => Color::from_hex(0xf87171),
-            NomVariant::Death => Color::from_hex(0x991b1b),
-            _ => Color::new(0.9961, 0.0, 0.9961, 1.0),
-        };
         if self.mutation_variant == 0 {
-            self.draw_mutation_bubble(self.rotate_point(vec2(5.0, -1.0)), false, mutation_color);
-            self.draw_mutation_bubble(self.rotate_point(vec2(-2.0, -3.0)), true, mutation_color);
-            self.draw_mutation_bubble(self.rotate_point(vec2(-3.0, 2.0)), false, mutation_color);
-            self.draw_mutation_bubble(self.rotate_point(vec2(3.0, 4.0)), false, mutation_color);
+            self.draw_mutation_bubble(self.rotate_point(vec2(5.0, -1.0)), false);
+            self.draw_mutation_bubble(self.rotate_point(vec2(-2.0, -3.0)), true);
+            self.draw_mutation_bubble(self.rotate_point(vec2(-4.0, 3.0)), false);
+            self.draw_mutation_bubble(self.rotate_point(vec2(3.0, 4.0)), true);
         }
         if self.mutation_variant == 1 {
-            self.draw_mutation_bubble(self.rotate_point(vec2(0.0, -3.0)), true, mutation_color);
-            self.draw_mutation_bubble(self.rotate_point(vec2(-3.0, 2.0)), false, mutation_color);
-            self.draw_mutation_bubble(self.rotate_point(vec2(3.0, 1.0)), false, mutation_color);
+            self.draw_mutation_bubble(self.rotate_point(vec2(0.0, -3.0)), true);
+            self.draw_mutation_bubble(self.rotate_point(vec2(-3.0, 3.0)), false);
+            self.draw_mutation_bubble(self.rotate_point(vec2(3.0, 3.0)), false);
         }
         if self.mutation_variant == 2 {
-            self.draw_mutation_bubble(self.rotate_point(vec2(1.0, -2.0)), true, mutation_color);
-            self.draw_mutation_bubble(self.rotate_point(vec2(-2.0, 3.0)), false, mutation_color);
+            self.draw_mutation_bubble(self.rotate_point(vec2(1.0, -2.0)), true);
+            self.draw_mutation_bubble(self.rotate_point(vec2(-2.0, 3.0)), false);
         }
     }
 
-    fn draw_mutation_bubble(&self, position: Vec2, large: bool, mutation_color: Color) {
+    fn draw_mutation_bubble(&self, position: Vec2, large: bool) {
         let start_size: f32 = 8.0;
         let finish_size: f32 = 18.0;
         draw_circle(
@@ -121,7 +183,7 @@ impl Nom {
                     / (finish_size - start_size))
                     * position.y,
             if large && self.size >= 18.0 { 2.0 } else { 1.0 },
-            mutation_color,
+            self.colors.mutation_color,
         );
     }
 

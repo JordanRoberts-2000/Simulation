@@ -1,4 +1,5 @@
 use ::rand::{thread_rng, Rng};
+use draw::NomColors;
 use macroquad::prelude::*;
 use noise::Perlin;
 
@@ -34,6 +35,7 @@ pub enum NomVariant {
 
 #[derive(Clone)]
 pub struct Nom {
+    colors: NomColors,
     pub size: f32,
     max_size: f32,
     age: f64,
@@ -62,6 +64,7 @@ impl Nom {
         let starting_orientation: f32 = thread_rng().gen_range(0.0..=359.0);
         let size = Nom::get_max_size(variant.clone());
         Self {
+            colors: Nom::get_colors(&variant),
             size,
             max_size: Nom::get_max_size(variant.clone()),
             age: get_time(),
@@ -90,12 +93,18 @@ impl Nom {
         // get random position,
         // check quadtree for collisions
         // add to quadtree
+        let size = Nom::get_max_size(variant.clone());
         let starting_orientation: f32 = thread_rng().gen_range(0.0..=359.0);
         let mut rng = thread_rng();
-        let size: f32 = 24.;
+        let mutation_variant = if variant == NomVariant::Hedgehog {
+            thread_rng().gen_range(1..=2)
+        } else {
+            thread_rng().gen_range(0..=2)
+        };
         Self {
+            colors: Nom::get_colors(&variant),
             size,
-            max_size: 24.0,
+            max_size: size,
             age: get_time(),
             position: vec2(
                 rng.gen_range(size / 2.0..screen_width() - size / 2.0),
@@ -111,7 +120,7 @@ impl Nom {
             turning_speed: (120.0 as f32).to_radians(),
             panicking: false,
             player_controlled: false,
-            mutation_variant: thread_rng().gen_range(0..=2),
+            mutation_variant,
             perlin: Perlin::new(1),
             time_offset: rand::gen_range(0.0, 1000.0),
             look_ahead_distance: size * 2.0,
@@ -130,7 +139,13 @@ impl Nom {
             NomVariant::Shark => 32.0,
             _ => 24.0,
         };
+        let mutation_variant = if variant == NomVariant::Hedgehog {
+            thread_rng().gen_range(1..=2)
+        } else {
+            thread_rng().gen_range(0..=2)
+        };
         Self {
+            colors: Nom::get_colors(&variant),
             size,
             max_size: size,
             age: get_time(),
@@ -145,7 +160,7 @@ impl Nom {
             turning_speed: (120.0 as f32).to_radians(),
             panicking: false,
             player_controlled: false,
-            mutation_variant: thread_rng().gen_range(0..=2),
+            mutation_variant,
             perlin: Perlin::new(1),
             time_offset: rand::gen_range(0.0, 1000.0),
             look_ahead_distance: size * 1.25,
