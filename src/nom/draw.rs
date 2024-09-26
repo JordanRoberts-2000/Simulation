@@ -36,6 +36,7 @@ impl Nom {
         let border_color = match variant {
             NomVariant::Wendigo => Color::from_hex(0x450a0a),
             NomVariant::Whale => Color::new(0.2, 0.0, 0.2, 1.0),
+            NomVariant::Leviathan => Color::new(0.2, 0.0, 0.2, 1.0),
             NomVariant::Death => Color::from_hex(0x525252),
             NomVariant::Shark => Color::from_hex(0x3b82f6),
             _ => Color::new(0.9961, 0.0, 0.9961, 1.0), // Default border color

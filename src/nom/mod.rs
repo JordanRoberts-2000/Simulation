@@ -12,14 +12,21 @@ mod utils;
 const NOM_SPAWN_DETECTION_RADIUS: f32 = 200.;
 const NOM_SPAWN_SPEED: f32 = 50.;
 
-pub struct Stats {
-    pub current_speed: f32,
-    pub max_speed: f32,
-    pub acceleration: f32,
-    pub orientation: f32,
+pub struct NomStats {
+    pub variant: NomVariant,
+    pub age: f64,
+    pub size: f32,
+    pub max_size: f32,
+    pub hunger: u32,
+    pub state: NomState,
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Debug)]
+pub enum NomState {
+    Wandering,
+}
+
+#[derive(Clone, PartialEq, Debug)]
 pub enum NomVariant {
     Default,
     BlueMutation,
@@ -40,7 +47,7 @@ pub struct Nom {
     max_size: f32,
     age: f64,
     pub position: Vec2,
-    variant: NomVariant,
+    pub variant: NomVariant,
     orientation: f32,
     target_position: Vec2,
     target_orientation: f32,
@@ -181,12 +188,14 @@ impl Nom {
         }
     }
 
-    pub fn get_stats(&self) -> Stats {
-        return Stats {
-            current_speed: self.current_speed,
-            max_speed: self.max_speed,
-            acceleration: self.acceleration,
-            orientation: self.orientation,
+    pub fn get_stats(&self) -> NomStats {
+        return NomStats {
+            variant: self.variant.clone(),
+            age: self.age,
+            size: self.size,
+            max_size: self.max_size,
+            hunger: 200,
+            state: NomState::Wandering,
         };
     }
 
@@ -196,5 +205,14 @@ impl Nom {
 
     pub fn hide_stats(&mut self) {
         self.stats_active = false;
+    }
+
+    pub fn set_variant(&mut self, variant: NomVariant) {
+        self.colors = Nom::get_colors(&variant);
+        self.variant = variant;
+    }
+
+    pub fn set_size(&mut self, size: f32) {
+        self.size = size;
     }
 }

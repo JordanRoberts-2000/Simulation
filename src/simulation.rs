@@ -66,7 +66,8 @@ impl Simulation {
                     .update(self.state.borrow().behaviors().movement());
             }
         }
-        self.entity_stats.update(self.state.borrow().noms());
+        self.entity_stats
+            .update(self.state.borrow().noms(), &self.dev_tools.is_active());
         self.dev_tools.update();
         if is_key_pressed(KeyCode::I) {
             self.environment_stats = !self.environment_stats;
