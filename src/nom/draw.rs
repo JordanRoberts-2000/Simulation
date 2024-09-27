@@ -142,12 +142,6 @@ impl Nom {
                 transparancy,
             ),
         );
-        // draw_circle(
-        //     self.position[0],
-        //     self.position[1],
-        //     ((self.size / 2.0) - 2.0) - if self.size > 18.0 { 2.0 } else { 1.5 },
-        //     Color::new(YELLOW.r, YELLOW.g, YELLOW.b, 0.3),
-        // );
     }
 
     fn draw_mutation(&self) {

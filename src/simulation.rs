@@ -29,7 +29,7 @@ pub struct Simulation {
 impl Simulation {
     pub fn new() -> Simulation {
         let noms = Rc::new(RefCell::new(vec![Rc::new(RefCell::new(Nom::new(
-            vec2(screen_width() / 2.0, screen_height() / 2.0),
+            vec2(350.0, 350.0),
             NomVariant::Default,
         )))]));
         let quadtree = Rc::new(RefCell::new(Quadtree::new()));

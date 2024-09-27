@@ -2,6 +2,8 @@ use command_line::CommandLine;
 use macroquad::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
+use tab_selection::Tabs;
+use tabs::nom_tools::NomTools;
 use tabs::simulation_tools::SimulationTools;
 
 use crate::simulation_state::SimulationState;
@@ -15,6 +17,8 @@ pub struct DevTools {
     devtools_active: bool,
     command_line: CommandLine,
     simulation_tools: SimulationTools,
+    nom_tools: NomTools,
+    current_tab: Tabs,
 }
 
 impl DevTools {
@@ -25,6 +29,8 @@ impl DevTools {
             devtools_active: false,
             command_line: CommandLine::new(),
             simulation_tools: SimulationTools::new(state.clone()),
+            nom_tools: NomTools::new(),
+            current_tab: Tabs::Simulation,
         }
     }
 
@@ -35,7 +41,11 @@ impl DevTools {
         // Devtools side bar:
         draw_rectangle(0., 0., 400., screen_height(), Color::new(0., 0., 0., 0.8));
         self.draw_tab_selection();
-        self.simulation_tools.draw(self.state.clone());
+        match self.current_tab {
+            Tabs::Simulation => self.simulation_tools.draw(self.state.clone()),
+            Tabs::Noms => self.nom_tools.draw(),
+            _ => {}
+        }
 
         draw_line(400., 0., 400., screen_height(), 1.0, GRAY);
         self.command_line.draw();
@@ -52,7 +62,12 @@ impl DevTools {
         }
         if self.devtools_active {
             self.command_line.update(self.state.clone());
-            self.simulation_tools.update(self.state.clone());
+            self.update_tab_selection();
+            match self.current_tab {
+                Tabs::Simulation => self.simulation_tools.update(self.state.clone()),
+                Tabs::Noms => self.nom_tools.update(),
+                _ => {}
+            }
         }
     }
 

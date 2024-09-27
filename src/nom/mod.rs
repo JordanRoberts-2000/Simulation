@@ -42,6 +42,8 @@ pub enum NomVariant {
 
 #[derive(Clone)]
 pub struct Nom {
+    pub temp_pos: Vec2,
+    pub temp_pos_2: Vec2,
     colors: NomColors,
     pub size: f32,
     max_size: f32,
@@ -72,6 +74,8 @@ impl Nom {
         let size = Nom::get_max_size(variant.clone());
         Self {
             colors: Nom::get_colors(&variant),
+            temp_pos: position,
+            temp_pos_2: position,
             size,
             max_size: Nom::get_max_size(variant.clone()),
             age: get_time(),
@@ -109,6 +113,8 @@ impl Nom {
             thread_rng().gen_range(0..=2)
         };
         Self {
+            temp_pos: vec2(0.0, 0.0),
+            temp_pos_2: vec2(0.0, 0.0),
             colors: Nom::get_colors(&variant),
             size,
             max_size: size,
@@ -152,6 +158,8 @@ impl Nom {
             thread_rng().gen_range(0..=2)
         };
         Self {
+            temp_pos: vec2(0.0, 0.0),
+            temp_pos_2: vec2(0.0, 0.0),
             colors: Nom::get_colors(&variant),
             size,
             max_size: size,
@@ -184,7 +192,7 @@ impl Nom {
             NomVariant::Whale => 160.0,
             NomVariant::Leviathan => 400.0,
             NomVariant::Shark => 32.0,
-            _ => 24.0,
+            _ => 32.0,
         }
     }
 

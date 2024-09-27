@@ -1,11 +1,11 @@
 use macroquad::prelude::*;
+use std::f32::consts::PI;
 
 use super::{utils::lerp_angle, Nom};
 
 impl Nom {
     pub fn update(&mut self, can_move: bool) {
         let delta_time = get_frame_time();
-        // println!("o: {}, t_o: {}", self.orientation, self.target_orientation);
         if can_move {
             self.update_orientation(delta_time);
             self.update_position(&delta_time);
