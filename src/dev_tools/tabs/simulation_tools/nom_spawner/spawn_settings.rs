@@ -29,10 +29,10 @@ pub struct NomSpawnerSettings {
 }
 
 impl NomSpawnerSettings {
-    pub fn new() -> Self {
+    pub fn new(state: Rc<RefCell<SimulationState>>) -> Self {
         Self {
             selection_twins: create_twins_selector(),
-            slider_spike_amount: Slider::new(106.0, 592.0, 4),
+            slider_spike_amount: Slider::new(106.0, 592.0, 4, state.borrow().devtools.spike_amount),
             toggle_random_spikes: Toggle::new(350.0, 594.0),
             selection_life_cycle: create_life_cycle_selector(),
         }
@@ -46,7 +46,7 @@ impl NomSpawnerSettings {
         self.selection_twins
             .draw(&state.borrow().devtools.twin_mutation);
         self.slider_spike_amount
-            .draw(&state.borrow().devtools.spike_amount);
+            .draw(state.borrow().devtools.spike_amount);
         self.toggle_random_spikes
             .draw(&state.borrow().devtools.random_spike_mutation);
         self.selection_life_cycle

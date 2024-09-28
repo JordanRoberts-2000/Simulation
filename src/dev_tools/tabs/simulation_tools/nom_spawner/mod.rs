@@ -23,7 +23,7 @@ impl NomSpawner {
         Self {
             nom_variant_selected: selected_variant.clone(),
             display_noms: NomSpawner::create_display_noms(),
-            spawn_settings: NomSpawnerSettings::new(),
+            spawn_settings: NomSpawnerSettings::new(state.clone()),
             spawn_buttons: NomSpawner::create_spawn_buttons(state, selected_variant),
         }
     }

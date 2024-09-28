@@ -9,33 +9,34 @@ pub struct Slider {
     handle_radius: f32,
     active_width: f32,
     length: u32,
-    index: u32,
     position: Vec2,
     handle_position: Vec2,
     dragging: bool,
 }
 
 impl Slider {
-    pub fn new(x: f32, y: f32, length: u32) -> Self {
+    pub fn new(x: f32, y: f32, length: u32, index: u32) -> Self {
         let width = 140.0;
-        let handle_position = vec2(x, y + 2.0);
+        let step_size = width / (length - 1) as f32;
+        let handle_position = vec2(x + step_size * index as f32, y + 2.0);
 
         Self {
             width,
             height: 4.0,
             rounding: 2.0,
             handle_radius: 6.0,
-            active_width: 0.0,
+            active_width: step_size * index as f32,
             length,
-            index: 0,
             position: vec2(x, y),
             handle_position,
             dragging: false,
         }
     }
 
-    pub fn draw(&self, selected: &u32) {
+    pub fn draw(&self, index: u32) {
         let step_size = self.width / (self.length - 1) as f32;
+        let active_width = step_size * index as f32;
+
         draw_rounded_rectangle(
             self.position.x,
             self.position.y,
@@ -45,39 +46,36 @@ impl Slider {
             WHITE,
         );
 
-        // Draw the active part of the slider
         draw_rounded_rectangle(
             self.position.x,
             self.position.y,
-            self.active_width,
+            active_width,
             self.height,
             self.rounding,
             BLUE,
         );
 
-        // Draw tick marks
         for i in 0..self.length {
             let tick_x = self.position.x + step_size * i as f32;
             let tick_y = self.position.y - 3.0;
             draw_rectangle(tick_x - 2.0, tick_y, 4.0, 10.0, WHITE);
         }
 
-        // Draw the slider handle
         draw_circle(
-            self.handle_position.x,
+            self.position.x + active_width,
             self.handle_position.y,
             self.handle_radius,
             WHITE,
         );
     }
 
-    pub fn update(&mut self, selected: &mut u32) {
+    pub fn update(&mut self, index: &mut u32) {
         let mouse_pos = mouse_position();
         let mouse_x = mouse_pos.0;
         let mouse_y = mouse_pos.1;
 
         if is_mouse_button_down(MouseButton::Left) {
-            let dist = ((mouse_x - self.handle_position.x).powi(2)
+            let dist = ((mouse_x - self.position.x - self.active_width).powi(2)
                 + (mouse_y - self.handle_position.y).powi(2))
             .sqrt();
 
@@ -89,23 +87,21 @@ impl Slider {
             }
         } else if self.dragging {
             self.dragging = false;
-            self.calculate_index();
-            self.snap_slider_index();
+            self.calculate_index(index);
+            self.snap_slider_index(*index);
         }
-
-        *selected = self.index;
     }
 
-    fn snap_slider_index(&mut self) {
+    fn snap_slider_index(&mut self, index: u32) {
         let step_size = self.width / (self.length - 1) as f32;
-        self.handle_position.x = self.position.x + step_size * self.index as f32;
+        self.handle_position.x = self.position.x + step_size * index as f32;
         self.active_width = self.handle_position.x - self.position.x;
     }
 
-    fn calculate_index(&mut self) {
+    fn calculate_index(&mut self, index: &mut u32) {
         let relative_x = self.handle_position.x - self.position.x;
         let step_size = self.width / (self.length - 1) as f32;
         let new_index = (relative_x / step_size).round() as u32;
-        self.index = new_index.min(self.length - 1);
+        *index = new_index.min(self.length - 1);
     }
 }
