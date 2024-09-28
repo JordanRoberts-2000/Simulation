@@ -347,6 +347,28 @@ impl Nom {
             (self.size / 2.0) + 7.0,
             Color::new(0.0, 0.0, 0.9882, 0.3),
         );
+        if self.has_twin {
+            let offset_x = -self.size / 2.0;
+            let offset_y = 0.0;
+
+            let twin_x = self.position[0] + offset_x * self.orientation.cos()
+                - offset_y * self.orientation.sin();
+            let twin_y = self.position[1]
+                + offset_x * self.orientation.sin()
+                + offset_y * self.orientation.cos();
+            draw_circle(
+                twin_x,
+                twin_y,
+                (self.size / 2.0) + 3.0,
+                Color::new(0.0, 0.0, 0.9882, 0.3),
+            );
+            draw_circle(
+                twin_x,
+                twin_y,
+                (self.size / 2.0) + 7.0,
+                Color::new(0.0, 0.0, 0.9882, 0.3),
+            )
+        }
     }
 
     pub fn draw_wandering_visuals(&self) {
