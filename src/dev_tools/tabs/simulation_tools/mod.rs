@@ -19,7 +19,7 @@ impl SimulationTools {
         Self {
             nom_spawner: NomSpawner::new(state.clone()),
             simulation_toggles: SimulationToggles::new(),
-            command_buttons: SimulationTools::create_command_buttons(state.clone()),
+            command_buttons: SimulationTools::create_command_buttons(state),
         }
     }
 

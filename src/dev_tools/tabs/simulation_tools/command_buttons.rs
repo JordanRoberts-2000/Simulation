@@ -11,6 +11,7 @@ use crate::dev_tools::SimulationTools;
 
 impl SimulationTools {
     pub fn create_command_buttons(state: Rc<RefCell<SimulationState>>) -> Vec<Button> {
+        let state: Rc<RefCell<SimulationState>> = state.clone();
         let command_buttons_y: f32 = 668.0;
 
         let mut clear_button = Button::new("clear");
@@ -38,7 +39,7 @@ impl SimulationTools {
 }
 
 fn clear_noms(state: Rc<RefCell<SimulationState>>) {
-    let noms = state.borrow().noms().clone();
+    let noms = state.borrow().noms.clone();
     handle_clear(noms.clone());
 }
 

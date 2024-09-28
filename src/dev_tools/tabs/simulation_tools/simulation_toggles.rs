@@ -21,16 +21,15 @@ impl SimulationToggles {
         draw_text("Quadgrid visuals:", 20.0, 100.0, 24.0, WHITE);
         draw_text("Spatial grid visuals:", 20.0, 140.0, 24.0, WHITE);
         draw_line(20.0, 162.0, 380.0, 162.0, 1.0, GRAY);
-        self.grid_visuals_toggle
-            .draw(&state.borrow().visuals().grid());
+        self.grid_visuals_toggle.draw(&state.borrow().visuals.grid);
         self.quadtree_visuals_toggle
-            .draw(&state.borrow().visuals().quadtree());
+            .draw(&state.borrow().visuals.quadtree);
     }
 
     pub fn update(&mut self, state: Rc<RefCell<SimulationState>>) {
         self.quadtree_visuals_toggle
-            .update(state.borrow_mut().visuals_mut().quadtree_mut());
+            .update(&mut state.borrow_mut().visuals.quadtree);
         self.grid_visuals_toggle
-            .update(state.borrow_mut().visuals_mut().grid_mut());
+            .update(&mut state.borrow_mut().visuals.grid);
     }
 }

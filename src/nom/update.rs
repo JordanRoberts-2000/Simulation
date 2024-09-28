@@ -4,9 +4,9 @@ use std::f32::consts::PI;
 use super::{utils::lerp_angle, Nom};
 
 impl Nom {
-    pub fn update(&mut self, can_move: bool) {
+    pub fn update(&mut self, movement_disabled: bool) {
         let delta_time = get_frame_time();
-        if can_move {
+        if !movement_disabled {
             self.update_orientation(delta_time);
             self.update_position(&delta_time);
         }

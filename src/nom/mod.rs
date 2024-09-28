@@ -42,8 +42,6 @@ pub enum NomVariant {
 
 #[derive(Clone)]
 pub struct Nom {
-    pub temp_pos: Vec2,
-    pub temp_pos_2: Vec2,
     colors: NomColors,
     pub size: f32,
     max_size: f32,
@@ -58,6 +56,8 @@ pub struct Nom {
     acceleration: f32,
     turning_speed: f32,
     panicking: bool,
+    spike_amount: u32,
+    has_twin: bool,
     player_controlled: bool,
     mutation_variant: u32,
     perlin: Perlin,
@@ -74,8 +74,6 @@ impl Nom {
         let size = Nom::get_max_size(variant.clone());
         Self {
             colors: Nom::get_colors(&variant),
-            temp_pos: position,
-            temp_pos_2: position,
             size,
             max_size: Nom::get_max_size(variant.clone()),
             age: get_time(),
@@ -89,6 +87,8 @@ impl Nom {
             acceleration: NOM_SPAWN_SPEED / 2.0,
             turning_speed: (120.0 as f32).to_radians(),
             panicking: false,
+            has_twin: false,
+            spike_amount: 0,
             player_controlled: false,
             mutation_variant: thread_rng().gen_range(0..=2),
             perlin: Perlin::new(1),
@@ -112,9 +112,41 @@ impl Nom {
         } else {
             thread_rng().gen_range(0..=2)
         };
+        let has_twin = match variant {
+            NomVariant::Default
+            | NomVariant::BlueMutation
+            | NomVariant::RedMutation
+            | NomVariant::GreenMutation => {
+                if thread_rng().gen_range(0..100) < 15 {
+                    true
+                } else {
+                    false
+                }
+            }
+            _ => false,
+        };
+        let spike_amount: u32 = match variant {
+            NomVariant::GreenMutation => {
+                if thread_rng().gen_range(0..100) < 70 {
+                    let number_option = vec![1, 3, 6];
+                    let random_index = thread_rng().gen_range(0..3);
+                    number_option[random_index]
+                } else {
+                    0
+                }
+            }
+            NomVariant::BlueMutation | NomVariant::Default | NomVariant::RedMutation => {
+                if thread_rng().gen_range(0..100) < 4 {
+                    let number_option = vec![1, 3, 6];
+                    let random_index = thread_rng().gen_range(0..3);
+                    number_option[random_index]
+                } else {
+                    0
+                }
+            }
+            _ => 0,
+        };
         Self {
-            temp_pos: vec2(0.0, 0.0),
-            temp_pos_2: vec2(0.0, 0.0),
             colors: Nom::get_colors(&variant),
             size,
             max_size: size,
@@ -132,6 +164,8 @@ impl Nom {
             acceleration: NOM_SPAWN_SPEED / 2.0,
             turning_speed: (120.0 as f32).to_radians(),
             panicking: false,
+            has_twin,
+            spike_amount,
             player_controlled: false,
             mutation_variant,
             perlin: Perlin::new(1),
@@ -158,8 +192,6 @@ impl Nom {
             thread_rng().gen_range(0..=2)
         };
         Self {
-            temp_pos: vec2(0.0, 0.0),
-            temp_pos_2: vec2(0.0, 0.0),
             colors: Nom::get_colors(&variant),
             size,
             max_size: size,
@@ -174,6 +206,8 @@ impl Nom {
             acceleration: NOM_SPAWN_SPEED / 2.0,
             turning_speed: (120.0 as f32).to_radians(),
             panicking: false,
+            has_twin: false,
+            spike_amount: 0,
             player_controlled: false,
             mutation_variant,
             perlin: Perlin::new(1),

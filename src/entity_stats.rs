@@ -30,7 +30,7 @@ impl EntityStats {
         };
     }
 
-    pub fn update(&mut self, noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>, devtools_active: &bool) {
+    pub fn update(&mut self, noms: &Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>, devtools_active: &bool) {
         if self.active {
             self.kill_button.update();
         }
@@ -39,7 +39,7 @@ impl EntityStats {
 
     pub fn check_click(
         &mut self,
-        noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
+        noms: &Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
         devtools_active: &bool,
     ) {
         if is_mouse_button_pressed(MouseButton::Left) {
@@ -147,7 +147,7 @@ impl EntityStats {
                 8.0,
                 BLACK,
             );
-            self.display_nom.draw();
+            self.display_nom.draw_display();
             self.kill_button.draw();
             draw_line(
                 screen_width() - 312.0,

@@ -23,7 +23,6 @@ pub struct DevTools {
 
 impl DevTools {
     pub fn new(state: Rc<RefCell<SimulationState>>) -> Self {
-        let state = state.clone();
         Self {
             state: state.clone(),
             devtools_active: false,
@@ -43,7 +42,7 @@ impl DevTools {
         self.draw_tab_selection();
         match self.current_tab {
             Tabs::Simulation => self.simulation_tools.draw(self.state.clone()),
-            Tabs::Noms => self.nom_tools.draw(),
+            Tabs::Noms => self.nom_tools.draw(self.state.clone()),
             _ => {}
         }
 
@@ -65,7 +64,7 @@ impl DevTools {
             self.update_tab_selection();
             match self.current_tab {
                 Tabs::Simulation => self.simulation_tools.update(self.state.clone()),
-                Tabs::Noms => self.nom_tools.update(),
+                Tabs::Noms => self.nom_tools.update(self.state.clone()),
                 _ => {}
             }
         }

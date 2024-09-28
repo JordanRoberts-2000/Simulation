@@ -41,7 +41,7 @@ impl NomSpawner {
             twins: NomTwins::Off,
             twins_selection: NomSpawner::create_twins_selector(),
             spawn_buttons: NomSpawner::create_spawn_buttons(
-                state.borrow_mut().noms(),
+                state.borrow_mut().noms.clone(),
                 selected_variant,
             ),
         };

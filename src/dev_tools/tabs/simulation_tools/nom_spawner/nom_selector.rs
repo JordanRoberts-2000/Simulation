@@ -29,7 +29,7 @@ impl NomSpawner {
     pub fn draw_nom_selector(&self) {
         self.draw_selection_grid();
         for nom in self.display_noms.iter() {
-            nom.draw();
+            nom.draw_display();
         }
     }
 

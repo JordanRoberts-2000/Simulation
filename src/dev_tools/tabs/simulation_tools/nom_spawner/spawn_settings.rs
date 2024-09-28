@@ -29,7 +29,7 @@ impl NomSpawner {
 
     pub fn draw_spawn_settings(&self, state: Rc<RefCell<SimulationState>>) {
         self.spike_random_toggle
-            .draw(&state.borrow().behaviors().spike_mutation());
+            .draw(&state.borrow().behaviour.spike_mutation);
         self.spike_amount_slider.draw();
         self.life_cycle_selection.draw();
         self.twins_selection.draw();
@@ -41,7 +41,7 @@ impl NomSpawner {
 
     pub fn update_spawn_settings(&mut self, state: Rc<RefCell<SimulationState>>) {
         self.spike_random_toggle
-            .update(state.borrow_mut().behaviors_mut().spike_mutation_mut());
+            .update(&mut state.borrow_mut().behaviour.spike_mutation);
         self.spike_amount_slider.update();
         self.spike_amount = self.spike_amount_slider.get_index();
         self.life_cycle_selection.update();

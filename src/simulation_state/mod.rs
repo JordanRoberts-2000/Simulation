@@ -3,16 +3,17 @@ use std::{cell::RefCell, rc::Rc};
 use behaviour::Behaviour;
 use visuals::Visuals;
 
-use crate::{generate_getters, generate_mut_getters, nom::Nom, quadtree::Quadtree};
+use crate::{nom::Nom, quadtree::Quadtree};
 
 mod behaviour;
 mod visuals;
 
 pub struct SimulationState {
-    noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
-    quadtree: Rc<RefCell<Quadtree>>,
-    visuals: Visuals,
-    behaviour: Behaviour,
+    pub noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
+    pub quadtree: Rc<RefCell<Quadtree>>,
+    pub apply_to_all: bool,
+    pub visuals: Visuals,
+    pub behaviour: Behaviour,
 }
 
 impl SimulationState {
@@ -20,36 +21,15 @@ impl SimulationState {
         Self {
             noms,
             quadtree,
+            apply_to_all: false,
             visuals: Visuals::new(),
             behaviour: Behaviour::new(),
         }
     }
-
-    pub fn visuals(&self) -> &Visuals {
-        &self.visuals
-    }
-
-    pub fn visuals_mut(&mut self) -> &mut Visuals {
-        &mut self.visuals
-    }
-
-    pub fn behaviors(&self) -> &Behaviour {
-        &self.behaviour
-    }
-
-    pub fn behaviors_mut(&mut self) -> &mut Behaviour {
-        &mut self.behaviour
-    }
 }
 
-generate_getters!(
-  SimulationState,
-  noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
-  quadtree: Rc<RefCell<Quadtree>>
-);
-
-generate_mut_getters!(
-    SimulationState,
-    // nom_mut: noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>, <-- not needed cause clone
-    // quadtree_mut: quadtree: Rc<RefCell<Quadtree>>  <-- not needed
-);
+// generate_getters!(
+//   SimulationState,
+//   noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
+//   quadtree: Rc<RefCell<Quadtree>>
+// );

@@ -1,4 +1,8 @@
+use std::{cell::RefCell, rc::Rc};
+
 use macroquad::prelude::*;
+
+use crate::simulation_state::SimulationState;
 
 use super::{Nom, NomVariant};
 
@@ -11,16 +15,32 @@ pub struct NomColors {
 }
 
 impl Nom {
-    pub fn draw(&self) {
+    pub fn draw(&self, state: Rc<RefCell<SimulationState>>) {
         if self.stats_active {
             self.draw_viewing_stats();
         }
+        self.draw_spikes();
         self.draw_body();
         self.draw_glow();
         self.draw_mutation();
-        // if *testing_visuals.borrow() {
-        //     self.draw_testing_visuals();
-        // }
+        if state.borrow().visuals.nom_wandering {
+            self.draw_wandering_visuals();
+        }
+        if state.borrow().visuals.nom_detection_radius {
+            self.draw_detection_radius();
+        }
+        if state.borrow().visuals.nom_orientation {
+            self.draw_orientation_visuals();
+        }
+        if state.borrow().visuals.nom_target_orientation {
+            self.draw_target_orientation_visuals();
+        }
+    }
+
+    pub fn draw_display(&self) {
+        self.draw_body();
+        self.draw_glow();
+        self.draw_mutation();
     }
 
     pub fn get_colors(variant: &NomVariant) -> NomColors {
@@ -73,6 +93,35 @@ impl Nom {
         }
     }
 
+    pub fn draw_spikes(&self) {
+        if self.spike_amount == 0 {
+            return;
+        };
+        let angles = vec![
+            std::f32::consts::FRAC_PI_8,
+            std::f32::consts::FRAC_PI_8 * 2.0,
+            std::f32::consts::PI - std::f32::consts::FRAC_PI_8 * 3.0,
+            std::f32::consts::FRAC_PI_8 * 4.0 + std::f32::consts::PI,
+            std::f32::consts::FRAC_PI_8 * 6.0 + std::f32::consts::PI,
+            std::f32::consts::PI + std::f32::consts::FRAC_PI_8,
+        ];
+        for angle in angles.iter().take(self.spike_amount as usize) {
+            let x_pos = self.position[0] + ((self.size / 2.0) - 3.0) * angle.cos();
+            let y_pos = self.position[1] + ((self.size / 2.0) - 3.0) * angle.sin();
+
+            draw_ellipse(x_pos, y_pos, 18.0, 2.0, angle.to_degrees(), LIGHTGRAY);
+
+            draw_ellipse(
+                x_pos,
+                y_pos,
+                6.0,
+                6.0,
+                angle.to_degrees(),
+                self.colors.border_color,
+            );
+        }
+    }
+
     fn draw_body(&self) {
         draw_circle(
             self.position[0],
@@ -84,6 +133,18 @@ impl Nom {
                 self.colors.body_color
             },
         );
+        if self.has_twin {
+            draw_circle(
+                self.position[0] + self.size / 2.5,
+                self.position[1] + self.size / 2.5,
+                self.size / 2.0,
+                if self.size >= 4.0 {
+                    self.colors.border_color
+                } else {
+                    self.colors.body_color
+                },
+            );
+        }
         match self.variant {
             NomVariant::Whale => {
                 for i in 0..10 {
@@ -113,6 +174,14 @@ impl Nom {
                         (self.size / 2.0) - if self.size > 18.0 { 2.0 } else { 1.5 },
                         self.colors.body_color,
                     );
+                    if self.has_twin {
+                        draw_circle(
+                            self.position[0] + self.size / 2.5,
+                            self.position[1] + self.size / 2.5,
+                            (self.size / 2.0) - if self.size > 18.0 { 2.0 } else { 1.5 },
+                            self.colors.body_color,
+                        );
+                    }
                 }
             }
         }
@@ -142,6 +211,19 @@ impl Nom {
                 transparancy,
             ),
         );
+        if self.has_twin {
+            draw_circle(
+                self.position[0] + self.size / 2.5,
+                self.position[1] + self.size / 2.5,
+                ((self.size / 2.0) - offset) - if self.size > 18.0 { 2.0 } else { 1.5 },
+                Color::new(
+                    self.colors.glow_color.r,
+                    self.colors.glow_color.g,
+                    self.colors.glow_color.b,
+                    transparancy,
+                ),
+            );
+        }
     }
 
     fn draw_mutation(&self) {
@@ -177,9 +259,29 @@ impl Nom {
                 + ((self.size.clamp(start_size, finish_size) - start_size)
                     / (finish_size - start_size))
                     * position.y,
-            if large && self.size >= 18.0 { 2.0 } else { 1.0 },
+            if large && self.size >= 18.0 && self.variant != NomVariant::Hedgehog {
+                2.0
+            } else {
+                1.0
+            },
             self.colors.mutation_color,
         );
+        if self.has_twin {
+            draw_circle(
+                self.position[0]
+                    + self.size / 2.5
+                    + ((self.size.clamp(start_size, finish_size) - start_size)
+                        / (finish_size - start_size))
+                        * position.x,
+                self.position[1]
+                    + self.size / 2.5
+                    + ((self.size.clamp(start_size, finish_size) - start_size)
+                        / (finish_size - start_size))
+                        * position.y,
+                if large && self.size >= 18.0 { 2.0 } else { 1.0 },
+                self.colors.mutation_color,
+            );
+        }
     }
 
     fn rotate_point(&self, point: Vec2) -> Vec2 {
@@ -203,48 +305,49 @@ impl Nom {
             self.position[1],
             (self.size / 2.0) + 7.0,
             Color::new(0.0, 0.0, 0.9882, 0.3),
-        );
+        )
     }
 
-    pub fn draw_testing_visuals(&self) {
-        // Detection radius
-        draw_circle_lines(self.position.x, self.position.y, 200.0, 2.0, DARKGRAY);
-        // Orientation
-        {
-            let line_length = 30.0;
-            let x2 = self.position.x + self.orientation.cos() * line_length;
-            let y2 = self.position.y + self.orientation.sin() * line_length;
-            draw_line(self.position.x, self.position.y, x2, y2, 2.0, RED);
-        }
-        // Target orientation
-        {
-            let line_length = 30.0;
-            let x2 = self.position.x + self.target_orientation.cos() * line_length;
-            let y2 = self.position.y + self.target_orientation.sin() * line_length;
-            draw_line(self.position.x, self.position.y, x2, y2, 2.0, BLUE);
-        }
-        // Wander steering
+    pub fn draw_wandering_visuals(&self) {
         let look_ahead_distance = self.look_ahead_distance;
         let wander_radius = self.look_ahead_size / 2.0;
         let look_ahead_position = Vec2::new(
             self.position.x + self.orientation.cos() * look_ahead_distance,
             self.position.y + self.orientation.sin() * look_ahead_distance,
         );
-        // draw_circle_lines(
-        //     look_ahead_position.x,
-        //     look_ahead_position.y,
-        //     wander_radius,
-        //     2.0,
-        //     GREEN,
-        // );
-        // draw_circle(self.look_ahead_target.x, self.look_ahead_target.y, 5.0, RED);
-        // draw_line(
-        //     self.position.x,
-        //     self.position.y,
-        //     self.look_ahead_target.x,
-        //     self.look_ahead_target.y,
-        //     2.0,
-        //     RED,
-        // );
+        draw_circle_lines(
+            look_ahead_position.x,
+            look_ahead_position.y,
+            wander_radius,
+            2.0,
+            GREEN,
+        );
+        draw_circle(self.look_ahead_target.x, self.look_ahead_target.y, 5.0, RED);
+        draw_line(
+            self.position.x,
+            self.position.y,
+            self.look_ahead_target.x,
+            self.look_ahead_target.y,
+            2.0,
+            RED,
+        );
+    }
+
+    pub fn draw_orientation_visuals(&self) {
+        let line_length = 30.0;
+        let x2 = self.position.x + self.orientation.cos() * line_length;
+        let y2 = self.position.y + self.orientation.sin() * line_length;
+        draw_line(self.position.x, self.position.y, x2, y2, 2.0, RED);
+    }
+
+    pub fn draw_target_orientation_visuals(&self) {
+        let line_length = 30.0;
+        let x2 = self.position.x + self.target_orientation.cos() * line_length;
+        let y2 = self.position.y + self.target_orientation.sin() * line_length;
+        draw_line(self.position.x, self.position.y, x2, y2, 2.0, BLUE);
+    }
+
+    pub fn draw_detection_radius(&self) {
+        draw_circle_lines(self.position.x, self.position.y, 200.0, 2.0, DARKGRAY);
     }
 }
