@@ -97,6 +97,7 @@ impl Nom {
         if self.spike_amount == 0 {
             return;
         };
+
         let angles = vec![
             std::f32::consts::FRAC_PI_8,
             std::f32::consts::FRAC_PI_8 * 2.0,
@@ -105,18 +106,27 @@ impl Nom {
             std::f32::consts::FRAC_PI_8 * 6.0 + std::f32::consts::PI,
             std::f32::consts::PI + std::f32::consts::FRAC_PI_8,
         ];
-        for angle in angles.iter().take(self.spike_amount as usize) {
-            let x_pos = self.position[0] + ((self.size / 2.0) - 3.0) * angle.cos();
-            let y_pos = self.position[1] + ((self.size / 2.0) - 3.0) * angle.sin();
 
-            draw_ellipse(x_pos, y_pos, 18.0, 2.0, angle.to_degrees(), LIGHTGRAY);
+        for angle in angles.iter().take(self.spike_amount as usize) {
+            let rotated_angle = angle + self.orientation;
+            let x_pos = self.position[0] + ((self.size / 2.0) - 3.0) * rotated_angle.cos();
+            let y_pos = self.position[1] + ((self.size / 2.0) - 3.0) * rotated_angle.sin();
+
+            draw_ellipse(
+                x_pos,
+                y_pos,
+                18.0,
+                2.0,
+                rotated_angle.to_degrees(),
+                LIGHTGRAY,
+            );
 
             draw_ellipse(
                 x_pos,
                 y_pos,
                 6.0,
                 6.0,
-                angle.to_degrees(),
+                rotated_angle.to_degrees(),
                 self.colors.border_color,
             );
         }
@@ -134,9 +144,18 @@ impl Nom {
             },
         );
         if self.has_twin {
+            let offset_x = -self.size / 2.0;
+            let offset_y = 0.0;
+
+            let twin_x = self.position[0] + offset_x * self.orientation.cos()
+                - offset_y * self.orientation.sin();
+            let twin_y = self.position[1]
+                + offset_x * self.orientation.sin()
+                + offset_y * self.orientation.cos();
+
             draw_circle(
-                self.position[0] + self.size / 2.5,
-                self.position[1] + self.size / 2.5,
+                twin_x,
+                twin_y,
                 self.size / 2.0,
                 if self.size >= 4.0 {
                     self.colors.border_color
@@ -175,9 +194,17 @@ impl Nom {
                         self.colors.body_color,
                     );
                     if self.has_twin {
+                        let offset_x = -self.size / 2.0;
+                        let offset_y = 0.0;
+
+                        let twin_x = self.position[0] + offset_x * self.orientation.cos()
+                            - offset_y * self.orientation.sin();
+                        let twin_y = self.position[1]
+                            + offset_x * self.orientation.sin()
+                            + offset_y * self.orientation.cos();
                         draw_circle(
-                            self.position[0] + self.size / 2.5,
-                            self.position[1] + self.size / 2.5,
+                            twin_x,
+                            twin_y,
                             (self.size / 2.0) - if self.size > 18.0 { 2.0 } else { 1.5 },
                             self.colors.body_color,
                         );
@@ -212,9 +239,17 @@ impl Nom {
             ),
         );
         if self.has_twin {
+            let offset_x = -self.size / 2.0;
+            let offset_y = 0.0;
+
+            let twin_x = self.position[0] + offset_x * self.orientation.cos()
+                - offset_y * self.orientation.sin();
+            let twin_y = self.position[1]
+                + offset_x * self.orientation.sin()
+                + offset_y * self.orientation.cos();
             draw_circle(
-                self.position[0] + self.size / 2.5,
-                self.position[1] + self.size / 2.5,
+                twin_x,
+                twin_y,
                 ((self.size / 2.0) - offset) - if self.size > 18.0 { 2.0 } else { 1.5 },
                 Color::new(
                     self.colors.glow_color.r,
@@ -267,14 +302,20 @@ impl Nom {
             self.colors.mutation_color,
         );
         if self.has_twin {
+            let offset_x = -self.size / 2.0;
+            let offset_y = 0.0;
+
+            let twin_x = self.position[0] + offset_x * self.orientation.cos()
+                - offset_y * self.orientation.sin();
+            let twin_y = self.position[1]
+                + offset_x * self.orientation.sin()
+                + offset_y * self.orientation.cos();
             draw_circle(
-                self.position[0]
-                    + self.size / 2.5
+                twin_x
                     + ((self.size.clamp(start_size, finish_size) - start_size)
                         / (finish_size - start_size))
                         * position.x,
-                self.position[1]
-                    + self.size / 2.5
+                twin_y
                     + ((self.size.clamp(start_size, finish_size) - start_size)
                         / (finish_size - start_size))
                         * position.y,
@@ -305,7 +346,7 @@ impl Nom {
             self.position[1],
             (self.size / 2.0) + 7.0,
             Color::new(0.0, 0.0, 0.9882, 0.3),
-        )
+        );
     }
 
     pub fn draw_wandering_visuals(&self) {
