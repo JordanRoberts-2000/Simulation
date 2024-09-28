@@ -93,24 +93,11 @@ impl Nom {
         }
     }
 
-    pub fn draw_spikes(&self) {
-        if self.spike_amount == 0 {
-            return;
-        };
-
-        let angles = vec![
-            std::f32::consts::FRAC_PI_8,
-            std::f32::consts::FRAC_PI_8 * 2.0,
-            std::f32::consts::PI - std::f32::consts::FRAC_PI_8 * 3.0,
-            std::f32::consts::FRAC_PI_8 * 4.0 + std::f32::consts::PI,
-            std::f32::consts::FRAC_PI_8 * 6.0 + std::f32::consts::PI,
-            std::f32::consts::PI + std::f32::consts::FRAC_PI_8,
-        ];
-
+    pub fn draw_spikes_around_circle(&self, position: Vec2, angles: &Vec<f32>) {
         for angle in angles.iter().take(self.spike_amount as usize) {
             let rotated_angle = angle + self.orientation;
-            let x_pos = self.position[0] + ((self.size / 2.0) - 3.0) * rotated_angle.cos();
-            let y_pos = self.position[1] + ((self.size / 2.0) - 3.0) * rotated_angle.sin();
+            let x_pos = position[0] + ((self.size / 2.0) - 3.0) * rotated_angle.cos();
+            let y_pos = position[1] + ((self.size / 2.0) - 3.0) * rotated_angle.sin();
 
             draw_ellipse(
                 x_pos,
@@ -129,6 +116,46 @@ impl Nom {
                 rotated_angle.to_degrees(),
                 self.colors.border_color,
             );
+        }
+    }
+
+    pub fn draw_spikes(&self) {
+        if self.spike_amount == 0 {
+            return;
+        };
+        if !self.has_twin {
+            let angles = vec![
+                std::f32::consts::FRAC_PI_8,
+                std::f32::consts::FRAC_PI_8 * 2.0,
+                std::f32::consts::PI - std::f32::consts::FRAC_PI_8 * 3.0,
+                std::f32::consts::FRAC_PI_8 * 4.0 + std::f32::consts::PI,
+                std::f32::consts::FRAC_PI_8 * 6.0 + std::f32::consts::PI,
+                std::f32::consts::PI + std::f32::consts::FRAC_PI_8,
+            ];
+            self.draw_spikes_around_circle(vec2(self.position.x, self.position.y), &angles);
+        } else {
+            let offset_x = -self.size / 2.0;
+            let offset_y = 0.0;
+
+            let twin_x = self.position[0] + offset_x * self.orientation.cos()
+                - offset_y * self.orientation.sin();
+            let twin_y = self.position[1]
+                + offset_x * self.orientation.sin()
+                + offset_y * self.orientation.cos();
+            let sibling_one_angle = vec![
+                std::f32::consts::FRAC_PI_3,
+                std::f32::consts::FRAC_PI_3 + std::f32::consts::FRAC_PI_8,
+                std::f32::consts::PI + std::f32::consts::FRAC_PI_8 * 2.0,
+                0.0,
+                0.0 - std::f32::consts::FRAC_PI_3,
+                std::f32::consts::PI - std::f32::consts::FRAC_PI_8 * 2.0,
+            ];
+            self.draw_spikes_around_circle(
+                vec2(self.position.x, self.position.y),
+                &sibling_one_angle,
+            );
+            let sibling_two_angle = vec![std::f32::consts::PI + std::f32::consts::FRAC_PI_8];
+            self.draw_spikes_around_circle(vec2(twin_x, twin_y), &sibling_two_angle);
         }
     }
 
