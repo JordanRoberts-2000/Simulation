@@ -27,17 +27,17 @@ impl NomTools {
 
     pub fn update(&mut self, state: Rc<RefCell<SimulationState>>) {
         self.toggle_all_toggle
-            .update(&mut state.borrow_mut().apply_to_all);
+            .update(&mut state.borrow_mut().devtools.apply_to_all);
         self.disable_movement_toggle
-            .update(&mut state.borrow_mut().behaviour.disable_movement);
+            .update(&mut state.borrow_mut().devtools.disable_movement);
         self.wandering_toggle
-            .update(&mut state.borrow_mut().visuals.nom_wandering);
+            .update(&mut state.borrow_mut().devtools.visuals.nom_wandering);
         self.orientation_toggle
-            .update(&mut state.borrow_mut().visuals.nom_orientation);
+            .update(&mut state.borrow_mut().devtools.visuals.nom_orientation);
         self.target_orientation_toggle
-            .update(&mut state.borrow_mut().visuals.nom_target_orientation);
+            .update(&mut state.borrow_mut().devtools.visuals.nom_target_orientation);
         self.detection_radius_toggle
-            .update(&mut state.borrow_mut().visuals.nom_detection_radius);
+            .update(&mut state.borrow_mut().devtools.visuals.nom_detection_radius);
     }
 
     pub fn draw(&self, state: Rc<RefCell<SimulationState>>) {
@@ -49,16 +49,17 @@ impl NomTools {
         draw_text("Target orientation visuals:", 20.0, 280.0, 24.0, WHITE);
         draw_text("Detection radius visuals:", 20.0, 320.0, 24.0, WHITE);
         draw_line(20.0, 348.0, 380.0, 348.0, 1.0, GRAY);
-        self.toggle_all_toggle.draw(&state.borrow().apply_to_all);
+        self.toggle_all_toggle
+            .draw(&state.borrow().devtools.apply_to_all);
         self.disable_movement_toggle
-            .draw(&state.borrow().behaviour.disable_movement);
+            .draw(&state.borrow().devtools.disable_movement);
         self.wandering_toggle
-            .draw(&state.borrow().visuals.nom_wandering);
+            .draw(&state.borrow().devtools.visuals.nom_wandering);
         self.orientation_toggle
-            .draw(&state.borrow().visuals.nom_orientation);
+            .draw(&state.borrow().devtools.visuals.nom_orientation);
         self.target_orientation_toggle
-            .draw(&state.borrow().visuals.nom_target_orientation);
+            .draw(&state.borrow().devtools.visuals.nom_target_orientation);
         self.detection_radius_toggle
-            .draw(&state.borrow().visuals.nom_detection_radius);
+            .draw(&state.borrow().devtools.visuals.nom_detection_radius);
     }
 }

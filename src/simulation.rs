@@ -45,7 +45,7 @@ impl Simulation {
         {
             for nom in self.state.borrow().noms.borrow().iter() {
                 nom.borrow_mut()
-                    .update(self.state.borrow().behaviour.disable_movement);
+                    .update(self.state.borrow().devtools.disable_movement);
             }
         }
         self.entity_stats
@@ -72,10 +72,7 @@ impl Simulation {
             .borrow()
             .quadtree
             .borrow()
-            .draw(self.state.borrow().visuals.quadtree);
-        // for plant in &self.state.plant_vec {
-        //     plant.draw();
-        // }
+            .draw(self.state.borrow().devtools.visuals.quadtree);
         for nom in self.state.borrow().noms.borrow().iter() {
             nom.borrow().draw(self.state.clone());
         }

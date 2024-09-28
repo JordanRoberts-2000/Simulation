@@ -38,8 +38,8 @@ impl CommandLine {
                     state.borrow().quadtree.clone(),
                 );
             }
-            "freeze" => handle_freeze(&mut state.borrow_mut().behaviour.disable_movement),
-            "unfreeze" => handle_unfreeze(&mut state.borrow_mut().behaviour.disable_movement),
+            "freeze" => handle_freeze(&mut state.borrow_mut().devtools.disable_movement),
+            "unfreeze" => handle_unfreeze(&mut state.borrow_mut().devtools.disable_movement),
             _ => self.invalid_command = true,
         }
         self.store_command(self.input_field.clone());

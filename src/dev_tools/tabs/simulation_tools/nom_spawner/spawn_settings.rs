@@ -1,9 +1,10 @@
 use ::macroquad::prelude::*;
 use std::{cell::RefCell, rc::Rc};
 
-use crate::{simulation_state::SimulationState, utils::ui::selection::Selection};
-
-use super::NomSpawner;
+use crate::{
+    simulation_state::SimulationState,
+    utils::ui::{selection::Selection, slider::Slider, toggle::Toggle},
+};
 
 #[derive(Clone, PartialEq)]
 pub enum NomLifeCycle {
@@ -20,52 +21,65 @@ pub enum NomTwins {
     Random,
 }
 
-impl NomSpawner {
-    pub fn configure_spawn_settings(&mut self) {
-        self.spike_amount_slider.set(106.0, 592.0, 140.0);
-        self.life_cycle_selection.set(100.0, 565.0);
-        self.twins_selection.set(100.0, 530.0);
+pub struct NomSpawnerSettings {
+    selection_twins: Selection<NomTwins>,
+    slider_spike_amount: Slider,
+    toggle_random_spikes: Toggle,
+    selection_life_cycle: Selection<NomLifeCycle>,
+}
+
+impl NomSpawnerSettings {
+    pub fn new() -> Self {
+        Self {
+            selection_twins: create_twins_selector(),
+            slider_spike_amount: Slider::new(106.0, 592.0, 4),
+            toggle_random_spikes: Toggle::new(350.0, 594.0),
+            selection_life_cycle: create_life_cycle_selector(),
+        }
     }
 
-    pub fn draw_spawn_settings(&self, state: Rc<RefCell<SimulationState>>) {
-        self.spike_random_toggle
-            .draw(&state.borrow().behaviour.spike_mutation);
-        self.spike_amount_slider.draw();
-        self.life_cycle_selection.draw();
-        self.twins_selection.draw();
+    pub fn draw(&self, state: Rc<RefCell<SimulationState>>) {
         draw_text("Random", 266.0, 598.0, 18.0, WHITE);
         draw_text("Twins:", 20.0, 530.0, 22.0, WHITE);
         draw_text("Stage:", 20.0, 565.0, 22.0, WHITE);
         draw_text("Spikes:", 20.0, 600.0, 22.0, WHITE);
+        self.selection_twins
+            .draw(&state.borrow().devtools.twin_mutation);
+        self.slider_spike_amount
+            .draw(&state.borrow().devtools.spike_amount);
+        self.toggle_random_spikes
+            .draw(&state.borrow().devtools.random_spike_mutation);
+        self.selection_life_cycle
+            .draw(&state.borrow().devtools.nom_life_cycle);
     }
 
-    pub fn update_spawn_settings(&mut self, state: Rc<RefCell<SimulationState>>) {
-        self.spike_random_toggle
-            .update(&mut state.borrow_mut().behaviour.spike_mutation);
-        self.spike_amount_slider.update();
-        self.spike_amount = self.spike_amount_slider.get_index();
-        self.life_cycle_selection.update();
-        self.life_cycle = self.life_cycle_selection.get_selected();
-        self.twins_selection.update();
-        self.twins = self.twins_selection.get_selected();
+    pub fn update(&mut self, state: Rc<RefCell<SimulationState>>) {
+        self.selection_twins
+            .update(&mut state.borrow_mut().devtools.twin_mutation);
+        self.slider_spike_amount
+            .update(&mut state.borrow_mut().devtools.spike_amount);
+        self.toggle_random_spikes
+            .update(&mut state.borrow_mut().devtools.random_spike_mutation);
+        self.selection_life_cycle
+            .update(&mut state.borrow_mut().devtools.nom_life_cycle);
     }
+}
 
-    pub fn create_life_cycle_selector() -> Selection<NomLifeCycle> {
-        let options = vec![
-            ("Baby", NomLifeCycle::Baby),
-            ("Adult", NomLifeCycle::Adult),
-            ("Old", NomLifeCycle::Old),
-            ("Dead", NomLifeCycle::Dead),
-        ];
-        Selection::new(options, NomLifeCycle::Adult)
-    }
+fn create_life_cycle_selector() -> Selection<NomLifeCycle> {
+    let options = vec![
+        ("Baby", NomLifeCycle::Baby),
+        ("Adult", NomLifeCycle::Adult),
+        ("Old", NomLifeCycle::Old),
+        ("Dead", NomLifeCycle::Dead),
+    ];
+    Selection::new(100.0, 565.0, options)
+}
 
-    pub fn create_twins_selector() -> Selection<NomTwins> {
-        let options = vec![
-            ("Off", NomTwins::Off),
-            ("On", NomTwins::On),
-            ("Random", NomTwins::Random),
-        ];
-        Selection::new(options, NomTwins::Off)
-    }
+fn create_twins_selector() -> Selection<NomTwins> {
+    let options = vec![
+        ("Off", NomTwins::Off),
+        ("On", NomTwins::On),
+        ("Random", NomTwins::Random),
+    ];
+    Selection::new(100.0, 530.0, options)
 }

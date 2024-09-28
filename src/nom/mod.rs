@@ -144,6 +144,7 @@ impl Nom {
                     0
                 }
             }
+            NomVariant::Leviathan => 6,
             _ => 0,
         };
         Self {

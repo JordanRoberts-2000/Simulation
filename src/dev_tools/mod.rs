@@ -10,7 +10,7 @@ use crate::simulation_state::SimulationState;
 
 mod command_line;
 mod tab_selection;
-mod tabs;
+pub mod tabs;
 
 pub struct DevTools {
     state: Rc<RefCell<SimulationState>>,

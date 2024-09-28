@@ -1,19 +1,16 @@
 use std::{cell::RefCell, rc::Rc};
 
-use behaviour::Behaviour;
-use visuals::Visuals;
+use devtools::DevtoolState;
 
 use crate::{nom::Nom, quadtree::Quadtree};
 
-mod behaviour;
+mod devtools;
 mod visuals;
 
 pub struct SimulationState {
     pub noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
     pub quadtree: Rc<RefCell<Quadtree>>,
-    pub apply_to_all: bool,
-    pub visuals: Visuals,
-    pub behaviour: Behaviour,
+    pub devtools: DevtoolState,
 }
 
 impl SimulationState {
@@ -21,9 +18,7 @@ impl SimulationState {
         Self {
             noms,
             quadtree,
-            apply_to_all: false,
-            visuals: Visuals::new(),
-            behaviour: Behaviour::new(),
+            devtools: DevtoolState::new(),
         }
     }
 }
