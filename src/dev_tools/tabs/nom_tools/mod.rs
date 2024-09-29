@@ -1,65 +1,68 @@
+use macroquad::prelude::*;
+use nom_buttons::NomButtons;
+use nom_toggles::NomToggles;
 use std::{cell::RefCell, rc::Rc};
 
-use macroquad::prelude::*;
+use crate::{nom::Nom, simulation_state::SimulationState};
 
-use crate::{simulation_state::SimulationState, utils::ui::toggle::Toggle};
+mod nom_buttons;
+mod nom_toggles;
 
 pub struct NomTools {
-    toggle_all_toggle: Toggle,
-    disable_movement_toggle: Toggle,
-    wandering_toggle: Toggle,
-    orientation_toggle: Toggle,
-    target_orientation_toggle: Toggle,
-    detection_radius_toggle: Toggle,
+    nom_toggles: NomToggles,
+    nom_buttons: NomButtons,
 }
 
 impl NomTools {
     pub fn new() -> Self {
         Self {
-            toggle_all_toggle: Toggle::new(350.0, 95.0),
-            disable_movement_toggle: Toggle::new(350.0, 155.0),
-            wandering_toggle: Toggle::new(350.0, 195.0),
-            orientation_toggle: Toggle::new(350.0, 235.0),
-            target_orientation_toggle: Toggle::new(350.0, 275.0),
-            detection_radius_toggle: Toggle::new(350.0, 315.0),
+            nom_toggles: NomToggles::new(),
+            nom_buttons: NomButtons::new(),
         }
     }
 
     pub fn update(&mut self, state: Rc<RefCell<SimulationState>>) {
-        self.toggle_all_toggle
-            .update(&mut state.borrow_mut().devtools.apply_to_all);
-        self.disable_movement_toggle
-            .update(&mut state.borrow_mut().devtools.disable_movement);
-        self.wandering_toggle
-            .update(&mut state.borrow_mut().devtools.visuals.nom_wandering);
-        self.orientation_toggle
-            .update(&mut state.borrow_mut().devtools.visuals.nom_orientation);
-        self.target_orientation_toggle
-            .update(&mut state.borrow_mut().devtools.visuals.nom_target_orientation);
-        self.detection_radius_toggle
-            .update(&mut state.borrow_mut().devtools.visuals.nom_detection_radius);
+        self.nom_toggles.update(state);
+        self.nom_buttons.update();
     }
 
     pub fn draw(&self, state: Rc<RefCell<SimulationState>>) {
-        draw_text("Apply to all noms:", 20.0, 100.0, 24.0, WHITE);
-        draw_line(20.0, 122.0, 380.0, 122.0, 1.0, GRAY);
-        draw_text("Disable movement:", 20.0, 160.0, 24.0, WHITE);
-        draw_text("Wandering visuals:", 20.0, 200.0, 24.0, WHITE);
-        draw_text("Orientation visuals:", 20.0, 240.0, 24.0, WHITE);
-        draw_text("Target orientation visuals:", 20.0, 280.0, 24.0, WHITE);
-        draw_text("Detection radius visuals:", 20.0, 320.0, 24.0, WHITE);
-        draw_line(20.0, 348.0, 380.0, 348.0, 1.0, GRAY);
-        self.toggle_all_toggle
-            .draw(&state.borrow().devtools.apply_to_all);
-        self.disable_movement_toggle
-            .draw(&state.borrow().devtools.disable_movement);
-        self.wandering_toggle
-            .draw(&state.borrow().devtools.visuals.nom_wandering);
-        self.orientation_toggle
-            .draw(&state.borrow().devtools.visuals.nom_orientation);
-        self.target_orientation_toggle
-            .draw(&state.borrow().devtools.visuals.nom_target_orientation);
-        self.detection_radius_toggle
-            .draw(&state.borrow().devtools.visuals.nom_detection_radius);
+        self.nom_toggles.draw(state.clone());
+        self.nom_buttons.draw();
+
+        if let Some(selected_nom) = state.borrow().selected_nom.borrow().as_ref() {
+            self.draw_nom_stats(selected_nom.clone());
+        } else {
+            draw_text("Select nom to see stats", 70.0, 430.0, 24.0, WHITE);
+        }
+    }
+
+    pub fn draw_nom_stats(&self, selected_nom: Rc<RefCell<Nom>>) {
+        let nom = selected_nom.borrow();
+
+        let stats = vec![
+            format!("Size: {:.0}", nom.size),
+            format!(
+                "Target Position: ({:.0}, {:.0})",
+                nom.target_position.x, nom.target_position.y
+            ),
+            format!("Orientation: {:.0}", nom.orientation.to_degrees()),
+            format!(
+                "Target Orientation: {:.0}",
+                nom.target_orientation.to_degrees()
+            ),
+            format!("Current Speed: {:.0}", nom.current_speed),
+            format!("Max Speed: {:.0}", nom.max_speed),
+            format!("Acceleration: {:.0}", nom.acceleration),
+            format!("Turning Speed: {:.0}", nom.turning_speed.to_degrees()),
+        ];
+
+        // Starting position for the text
+        let mut y_position = 420.0;
+
+        for stat in stats {
+            draw_text(&stat, 20.0, y_position, 20.0, WHITE);
+            y_position += 30.0; // Move down by 40 pixels for each line
+        }
     }
 }

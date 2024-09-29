@@ -31,11 +31,15 @@ impl Simulation {
         }
 
         let state = Rc::new(RefCell::new(SimulationState::new(noms, quadtree)));
+        let entity_stats = {
+            let state_borrow = state.borrow();
+            EntityStats::new(state_borrow.selected_nom.clone())
+        };
         let sim = Simulation {
             state: state.clone(),
             dev_tools: DevTools::new(state),
             environment_stats: false,
-            entity_stats: EntityStats::new(),
+            entity_stats,
         };
 
         sim
@@ -48,8 +52,10 @@ impl Simulation {
                     .update(self.state.borrow().devtools.disable_movement);
             }
         }
-        self.entity_stats
-            .update(&self.state.borrow().noms, &self.dev_tools.is_active());
+        self.entity_stats.update(
+            self.state.borrow().noms.clone(),
+            &self.dev_tools.is_active(),
+        );
         self.dev_tools.update();
         if is_key_pressed(KeyCode::I) {
             self.environment_stats = !self.environment_stats;

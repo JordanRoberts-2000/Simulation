@@ -11,6 +11,7 @@ pub struct SimulationState {
     pub noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
     pub quadtree: Rc<RefCell<Quadtree>>,
     pub devtools: DevtoolState,
+    pub selected_nom: Rc<RefCell<Option<Rc<RefCell<Nom>>>>>,
 }
 
 impl SimulationState {
@@ -19,6 +20,7 @@ impl SimulationState {
             noms,
             quadtree,
             devtools: DevtoolState::new(),
+            selected_nom: Rc::new(RefCell::new(None)),
         }
     }
 }

@@ -13,7 +13,7 @@ mod utils;
 fn window_conf() -> Conf {
     Conf {
         fullscreen: true,
-        window_title: "Simulation".to_owned(),
+        window_title: "Simulation Project".to_owned(),
         ..Default::default()
     }
 }

@@ -8,20 +8,20 @@ use crate::utils::ui::button::Button;
 
 pub struct EntityStats {
     pub active: bool,
-    current_nom: Option<Rc<RefCell<Nom>>>,
+    current_nom: Rc<RefCell<Option<Rc<RefCell<Nom>>>>>,
     display_nom: Nom,
     kill_button: Button,
 }
 
 impl EntityStats {
-    pub fn new() -> EntityStats {
+    pub fn new(selected_nom: Rc<RefCell<Option<Rc<RefCell<Nom>>>>>) -> EntityStats {
         let mut kill_button = Button::new("Kill");
         kill_button.pos(screen_width() - 88.0, screen_height() - 114.0);
         kill_button.on_click(|| println!("kill nom"));
         kill_button.padding(4.0, 2.0);
         return EntityStats {
             active: true,
-            current_nom: None,
+            current_nom: selected_nom.clone(),
             display_nom: Nom::display_new(
                 vec2(screen_width() - 60.0, screen_height() - 148.0),
                 NomVariant::Default,
@@ -30,7 +30,7 @@ impl EntityStats {
         };
     }
 
-    pub fn update(&mut self, noms: &Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>, devtools_active: &bool) {
+    pub fn update(&mut self, noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>, devtools_active: &bool) {
         if self.active {
             self.kill_button.update();
         }
@@ -39,7 +39,7 @@ impl EntityStats {
 
     pub fn check_click(
         &mut self,
-        noms: &Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
+        noms: Rc<RefCell<Vec<Rc<RefCell<Nom>>>>>,
         devtools_active: &bool,
     ) {
         if is_mouse_button_pressed(MouseButton::Left) {
@@ -72,13 +72,15 @@ impl EntityStats {
                     }
                 }
             }
+
             let noms_borrow = noms.borrow();
             let mut found_nom = false;
             for nom_ref in noms_borrow.iter() {
+                let distance;
                 {
                     let nom = nom_ref.borrow();
                     let nom_position = nom.position;
-                    let distance = ((mouse_position.0 - nom_position.x).powi(2)
+                    distance = ((mouse_position.0 - nom_position.x).powi(2)
                         + (mouse_position.1 - nom_position.y).powi(2))
                     .sqrt();
 
@@ -87,15 +89,22 @@ impl EntityStats {
                     }
                 }
 
+                // Show stats for the clicked nom
                 nom_ref.borrow_mut().show_stats();
                 found_nom = true;
-                if let Some(current_nom) = &self.current_nom {
+
+                // Borrow current_nom and update it
+                let mut current_nom_borrow = self.current_nom.borrow_mut();
+                if let Some(current_nom) = &*current_nom_borrow {
                     if !Rc::ptr_eq(current_nom, nom_ref) {
                         current_nom.borrow_mut().hide_stats();
                     }
                 }
+
+                // Update current_nom
+                *current_nom_borrow = Some(nom_ref.clone());
+
                 let new_variant = nom_ref.borrow().get_stats().variant;
-                self.current_nom = Some(nom_ref.clone());
                 let size = match new_variant {
                     NomVariant::Leviathan => 44.0,
                     NomVariant::Whale => 44.0,
@@ -103,23 +112,26 @@ impl EntityStats {
                 };
                 self.display_nom.set_size(size);
                 self.display_nom.set_variant(new_variant);
+
                 break;
             }
 
             if !found_nom {
-                if let Some(current_nom) = &self.current_nom {
+                let mut current_nom_borrow = self.current_nom.borrow_mut();
+                if let Some(current_nom) = &*current_nom_borrow {
                     current_nom.borrow_mut().hide_stats();
                 }
-                self.current_nom = None;
+                *current_nom_borrow = None;
             }
         }
     }
 
     pub fn draw(&self) {
-        if !self.active || self.current_nom.is_none() {
+        if !self.active || self.current_nom.borrow().is_none() {
             return;
         }
-        if let Some(current_nom) = &self.current_nom {
+
+        if let Some(current_nom) = self.current_nom.borrow().as_ref() {
             let nom_stats = current_nom.borrow().get_stats();
             let name_string = match nom_stats.variant {
                 NomVariant::Default => "Nom".to_string(),

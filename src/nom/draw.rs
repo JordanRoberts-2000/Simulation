@@ -23,16 +23,24 @@ impl Nom {
         self.draw_body();
         self.draw_glow();
         self.draw_mutation();
-        if state.borrow().devtools.visuals.nom_wandering {
+        if state.borrow().devtools.visuals.nom_wandering
+            && (self.stats_active || state.borrow().devtools.apply_to_all)
+        {
             self.draw_wandering_visuals();
         }
-        if state.borrow().devtools.visuals.nom_detection_radius {
+        if state.borrow().devtools.visuals.nom_detection_radius
+            && (self.stats_active || state.borrow().devtools.apply_to_all)
+        {
             self.draw_detection_radius();
         }
-        if state.borrow().devtools.visuals.nom_orientation {
+        if state.borrow().devtools.visuals.nom_orientation
+            && (self.stats_active || state.borrow().devtools.apply_to_all)
+        {
             self.draw_orientation_visuals();
         }
-        if state.borrow().devtools.visuals.nom_target_orientation {
+        if state.borrow().devtools.visuals.nom_target_orientation
+            && (self.stats_active || state.borrow().devtools.apply_to_all)
+        {
             self.draw_target_orientation_visuals();
         }
     }
